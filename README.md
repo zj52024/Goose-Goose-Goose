@@ -6,7 +6,7 @@ Free open-source cheat software for **Goose Goose Duck**
 
 ** ONLY FOR WINDOWS!!!!!**
 
-(Working on windows 10)
+(Tested on windows 10, not tested in other Windows versions.)
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 
@@ -18,7 +18,7 @@ Free open-source cheat software for **Goose Goose Duck**
 
 ## So, how to use?
 
-Still working.
+Just complie it, and inject with your favorite injector.
 
 ## Features
 

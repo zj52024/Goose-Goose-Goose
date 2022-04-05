@@ -1,4 +1,5 @@
 ﻿#include "utils.hpp"
+#include "offsets.hpp"
 
 #include "MinHook/include/MinHook.h"
 #include "kiero/kiero.h"
@@ -11,6 +12,7 @@
 #include <Windows.h>
 #include <d3d11.h>
 #include <iostream>
+#include <list>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -33,6 +35,9 @@ ID3D11RenderTargetView* mainRenderTargetView;
 bool init = false;
 bool canRender = true;
 
+list<DWORD_PTR> PlayerControllerList;
+list<DWORD_PTR>::iterator ListIterator;
+
 LRESULT WINAPI WndProc(HWND unnamedParam1, UINT unnamedParam2, WPARAM unnamedParam3, LPARAM unnamedParam4) {
 
 	if (ImGui_ImplWin32_WndProcHandler(unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4)) return true;
@@ -45,6 +50,15 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 	//myPlayerController = PlayerController;
 	//printf("HIT!   |   %p, actorNum: %d\n",PlayerController,*(int*)((long long)PlayerController+384));
 	//return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
+	
+	int cnt = 0;
+	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
+		if ((DWORD_PTR)PlayerController != *ListIterator) cnt++;
+	}
+
+	if(PlayerControllerList.size() == 0) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); cout << "Add new." << endl; }
+	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); cout << "Add new." << endl; }
+
 	MH_DisableHook(oFlip);
 	tFlip ret_val = (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
 	MH_EnableHook(oFlip);
@@ -92,18 +106,25 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 		{
 			ImGui::Begin("Goose Goose Goose");                          // Create a window called "Hello, world!" and append into it.
-
 			ImGui::Text("Hello cheater!");               // Display some text (you can use a format strings too)
-
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
 
-
-			if (ImGui::Button("Button"))
-			{
-				
+		{
+			ImGui::Begin("Player list");
+			if (ImGui::Button("Clear")) {
+				PlayerControllerList.clear();
 			}
-
-
+			//DWORD_PTR pRole, pNickname;
+			for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
+				//pRole = *ListIterator+GooseGooseDuck::PlayerController::playerRole;
+				//pNickname = *ListIterator + GooseGooseDuck::PlayerController::nickname;
+				//wchar_t name = 
+				//Silenced: %d\nInfected: %d\nInVent: %d\nHasBomb: %d\n
+				ImGui::Text("IsGhost: %d\nIsLocal: %d", (int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isGhost)),(int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isLocal)));
+				ImGui::Separator();
+			}
 			ImGui::End();
 		}
 

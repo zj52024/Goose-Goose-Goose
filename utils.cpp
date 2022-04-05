@@ -1,8 +1,3 @@
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <tchar.h>
-#include <Psapi.h>
-
 #include "utils.hpp"
 
 //https://stackoverflow.com/questions/26572459/c-get-module-base-address-for-64bit-application

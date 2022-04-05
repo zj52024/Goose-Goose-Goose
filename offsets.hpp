@@ -1,12 +1,15 @@
-#pragma once
-
 namespace GooseGooseDuck {
 	namespace PlayerController {
-		constexpr unsigned long Base = 0x2E6C220; // Handlers.GameHandlers.PlayerHandlers.PlayerController
-		constexpr unsigned long Nickname = 0x1A8; // string, pointer
-		constexpr unsigned long RoleIdPtr = 0xE0; // ptr
-		constexpr unsigned long isSilenced = 0xB9; // boolean
-		constexpr unsigned long isHelium = 0xBA; // boolean
-		constexpr unsigned long isInfected = 0xBB; // boolean
+		constexpr int isSilenced = 185; // Boolean
+		constexpr int isInfected = 187; // Boolean
+		constexpr int playerRole = 224; // pointer, [instance+playerRole] + 0x10, int
+		constexpr int inVent = 233; // Boolean
+		constexpr int hasBomb = 282; // Boolean
+		constexpr int isGhost = 360; // Boolean
+		constexpr int isLocal = 408; // Boolean
+		constexpr int nickname = 424; // pointer, [instance+nickname] +  0x14, length: [instance+nickname] + 0x10
+		constexpr int invisibilityDistance = 740; // int, need this?
+		constexpr int isSpectator = 818; // Boolean
+		constexpr int isRemoteSpectating = 819; // Boolean
 	}
 }
