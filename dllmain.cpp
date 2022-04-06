@@ -10,6 +10,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <tchar.h>
 #include <d3d11.h>
 #include <iostream>
 #include <list>
@@ -38,11 +39,16 @@ bool canRender = true;
 list<DWORD_PTR> PlayerControllerList;
 list<DWORD_PTR>::iterator ListIterator;
 
-LRESULT WINAPI WndProc(HWND unnamedParam1, UINT unnamedParam2, WPARAM unnamedParam3, LPARAM unnamedParam4) {
+LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
-	if (ImGui_ImplWin32_WndProcHandler(unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4)) return true;
+	if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
+		canRender = !canRender;
+		return false;
+	}
 
-	return CallWindowProc(oWndproc, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) return true;
+
+	return CallWindowProc(oWndproc, hWnd, uMsg, wParam, lParam);
 
 }
 
@@ -50,14 +56,14 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 	//myPlayerController = PlayerController;
 	//printf("HIT!   |   %p, actorNum: %d\n",PlayerController,*(int*)((long long)PlayerController+384));
 	//return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
-	
+
 	int cnt = 0;
 	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
 		if ((DWORD_PTR)PlayerController != *ListIterator) cnt++;
 	}
 
-	if(PlayerControllerList.size() == 0) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); cout << "Add new." << endl; }
-	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); cout << "Add new." << endl; }
+	if (PlayerControllerList.size() == 0) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); cout << "Add new: " << (DWORD_PTR)PlayerController << endl; }
+	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); cout << "Add new: " << (DWORD_PTR)PlayerController << endl; }
 
 	MH_DisableHook(oFlip);
 	tFlip ret_val = (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
@@ -86,6 +92,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 
 			ImGui_ImplWin32_Init(FindWindow(0, L"Goose Goose Duck"));
 			ImGui_ImplDX11_Init(pDevice, pContext);
@@ -119,10 +126,20 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			//DWORD_PTR pRole, pNickname;
 			for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
 				//pRole = *ListIterator+GooseGooseDuck::PlayerController::playerRole;
-				//pNickname = *ListIterator + GooseGooseDuck::PlayerController::nickname;
-				//wchar_t name = 
+
+				DWORD_PTR pNickname = (*ListIterator + GooseGooseDuck::PlayerController::nickname);
+				int nicknameLength = *(int*)(*(DWORD_PTR*)(pNickname)+0x10);
+				wchar_t nickname[17] = L"";
+				char WCTMBnickname[64] = "";
+
+				memcpy(nickname, (DWORD_PTR*)(*(DWORD_PTR*)(pNickname)+0x14), sizeof(wchar_t) * nicknameLength);
+				int len = WideCharToMultiByte(CP_UTF8, 0, nickname, -1, NULL, 0, NULL, NULL);
+				WideCharToMultiByte(CP_UTF8, 0, nickname, -1, WCTMBnickname, len, NULL, NULL);
+
+				ImGui::Text(u8"Nickname: %s\nNickname pointer: %p ", WCTMBnickname, (DWORD_PTR*)(*(DWORD_PTR*)(pNickname)+0x14));
+
 				//Silenced: %d\nInfected: %d\nInVent: %d\nHasBomb: %d\n
-				ImGui::Text("IsGhost: %d\nIsLocal: %d", (int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isGhost)),(int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isLocal)));
+				//ImGui::Text("IsGhost: %d\nIsLocal: %d", (int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isGhost)),(int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isLocal)));
 				ImGui::Separator();
 			}
 			ImGui::End();
@@ -131,10 +148,6 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		ImGui::Render();
 		pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	if (GetAsyncKeyState(VK_INSERT) & 1) {
-		canRender = !canRender;
 	}
 
 	return oPre(pSC, SyncInterval, Flags);
@@ -165,6 +178,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	case DLL_PROCESS_ATTACH:
 	{
 		DisableThreadLibraryCalls(hModule);
+		setlocale(LC_ALL, "");
 		CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)MainFunc, hModule, 0, NULL);
 		break;
 	}

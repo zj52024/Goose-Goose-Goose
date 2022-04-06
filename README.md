@@ -1,5 +1,7 @@
 # Goose Goose Goose
 
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
+
 Quack! Quack! Quack! Quack! Quack! Quack! Quack! Quack!Quack! Quack! Quack! Quack!
 
 Free open-source cheat software for **Goose Goose Duck**
@@ -7,8 +9,6 @@ Free open-source cheat software for **Goose Goose Duck**
 ** ONLY FOR WINDOWS!!!!!**
 
 (Tested on windows 10, not tested in other Windows versions.)
-
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 
 (I think it may be inefficient because I am not good at programming. If you think there's something to improve, please give us your active opinion.)
 
@@ -38,5 +38,6 @@ Reference
 
 - [Rebzzel / kiero](https://github.com/Rebzzel/kiero)
 - [TsudaKageyu / minhook](https://github.com/TsudaKageyu/minhook)
+- [ocornut / imgui](https://github.com/ocornut/imgui)
 - [stackoverflow - GetProcessBaseAddress](https://stackoverflow.com/questions/26572459/c-get-module-base-address-for-64bit-application)
 
