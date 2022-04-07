@@ -125,9 +125,14 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			}
 			//DWORD_PTR pRole, pNickname;
 			for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
-				//pRole = *ListIterator+GooseGooseDuck::PlayerController::playerRole;
 
-				DWORD_PTR pNickname = (*ListIterator + GooseGooseDuck::PlayerController::nickname);
+				if (*(char*)(*ListIterator + GooseGooseDuck::PlayerController::isPlayerRoleSet) != 0) {
+					DWORD_PTR addtemp = *ListIterator + GooseGooseDuck::PlayerController::playerRole;
+					int RoleId = *(int*)(*(DWORD_PTR*)(addtemp)+0x10);
+					ImGui::Text("RoleID: %d\nRoleID pointer: %p", RoleId, &RoleId);
+				}
+
+				DWORD_PTR pNickname = *ListIterator + GooseGooseDuck::PlayerController::nickname;
 				int nicknameLength = *(int*)(*(DWORD_PTR*)(pNickname)+0x10);
 				wchar_t nickname[17] = L"";
 				char WCTMBnickname[64] = "";
@@ -136,7 +141,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				int len = WideCharToMultiByte(CP_UTF8, 0, nickname, -1, NULL, 0, NULL, NULL);
 				WideCharToMultiByte(CP_UTF8, 0, nickname, -1, WCTMBnickname, len, NULL, NULL);
 
-				ImGui::Text(u8"Nickname: %s\nNickname pointer: %p ", WCTMBnickname, (DWORD_PTR*)(*(DWORD_PTR*)(pNickname)+0x14));
+				ImGui::Text(u8"%lld\nNickname pointer: %p\nNickname: %s\n",*ListIterator ,(DWORD_PTR*)(*(DWORD_PTR*)(pNickname)+0x14), WCTMBnickname);
 
 				//Silenced: %d\nInfected: %d\nInVent: %d\nHasBomb: %d\n
 				//ImGui::Text("IsGhost: %d\nIsLocal: %d", (int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isGhost)),(int)(*(char*)(*ListIterator+GooseGooseDuck::PlayerController::isLocal)));
@@ -164,7 +169,7 @@ void MainFunc(HMODULE hModule) {
 		// the index of the required function can be found in the METHODSTABLE.txt
 		kiero::bind(8, (void**)&oPre, hkPre);
 
-		oFlip = (tFlip)(GetGameAssemblyBase() + 0x192A290); // 0x192A290, Flip, RVA        GameAssembly.dll+RVA
+		oFlip = (tFlip)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA); // 0x192A290, Flip, RVA        GameAssembly.dll+RVA
 
 		MH_CreateHook(oFlip, hkFlip, NULL); // A big problem. without third param, it should be laggy on every flip event.
 		MH_EnableHook(oFlip);

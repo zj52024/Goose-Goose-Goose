@@ -1,8 +1,10 @@
 namespace GooseGooseDuck {
 	namespace PlayerController {
+		constexpr int flipRVA = 0x1669850;
 		constexpr int isSilenced = 185; // Boolean
 		constexpr int isInfected = 187; // Boolean
 		constexpr int playerRole = 224; // pointer, [instance+playerRole] + 0x10, int
+		constexpr int isPlayerRoleSet = 232; // Boolean
 		constexpr int inVent = 233; // Boolean
 		constexpr int hasBomb = 282; // Boolean
 		constexpr int isGhost = 360; // Boolean
