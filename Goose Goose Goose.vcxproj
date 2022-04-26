@@ -167,6 +167,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="kiero\kiero.h" />
     <ClInclude Include="MinHook\include\MinHook.h" />
+    <ClInclude Include="struct.hpp" />
     <ClInclude Include="utils.hpp" />
     <ClInclude Include="offsets.hpp" />
     <ClInclude Include="Role.hpp" />
