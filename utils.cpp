@@ -45,3 +45,4 @@ DWORD_PTR GetProcessBaseAddress(DWORD processID)
 DWORD_PTR GetGameAssemblyBase() {
 	return GetProcessBaseAddress(GetCurrentProcessId());
 }
+
