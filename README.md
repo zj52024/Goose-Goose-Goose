@@ -10,7 +10,7 @@ Free open-source cheat software for **Goose Goose Duck**
 
 (Tested on windows 10, not tested in other Windows versions.)
 
-(I think it may be inefficient because I am not good at programming. If you think there's something to improve, please give us your active opinion.)
+(I think it may be inefficient because I am not good at programming. If you think there's something to improve, please give me your active opinion.)
 
 
 #### It doesn't matter if it's not fun, and it's made for those who want to win.

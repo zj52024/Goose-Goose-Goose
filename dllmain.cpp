@@ -1,11 +1,4 @@
-﻿/*
-
-Crash when the game is end or quit. Need to be fixed. Very critical.
-Why? Wrong PlayerController reference?
-
-*/
-
-#include "utils.hpp"
+﻿#include "utils.hpp"
 #include "offsets.hpp"
 #include "struct.hpp"
 
@@ -29,7 +22,7 @@ using namespace std;
 
 typedef HRESULT(WINAPI* PRESENT)(IDXGISwapChain*, UINT, UINT);
 typedef LRESULT(WINAPI* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
-typedef void* (*tFlip)(void* PlayerController, int someval1, int someval2, void* PhotonData); // void Flip(PlayerController this, int NBPPNBKBMNF, int JMAHGLDEHHB, PhotonMessageInfo BJMKOJJELHA){}
+typedef void*(_stdcall* tFlip)(void* PlayerController, int someval1, int someval2, void* PhotonData); // void Flip(PlayerController this, int NBPPNBKBMNF, int JMAHGLDEHHB, PhotonMessageInfo BJMKOJJELHA){}
 
 ExampleAppLog appLog;
 
@@ -56,11 +49,12 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return false;
 	}
 
+	if (canRender){
+		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+		return true;
+	}
 
-	if (canRender)
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) return true;
-
-		return CallWindowProc(oWndproc, hWnd, uMsg, wParam, lParam);
+	return CallWindowProc(oWndproc, hWnd, uMsg, wParam, lParam);
 
 }
 
@@ -71,13 +65,10 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 		if ((DWORD_PTR)PlayerController != *ListIterator) cnt++;
 	}
 
-	if (PlayerControllerList.size() == 0) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); appLog.AddLog("[info] Add new PlayerController: %12llX\n",(DWORD_PTR)PlayerController); }
-	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); appLog.AddLog("[info] Add new PlayerController: %12llX\n",(DWORD_PTR)PlayerController); }
+	if (PlayerControllerList.size() == 0) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController); }
+	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController); }
 
-	MH_DisableHook(oFlip);
-	tFlip ret_val = (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
-	MH_EnableHook(oFlip);
-	return ret_val;
+	return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
 }
 
 HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
@@ -132,7 +123,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			ImGui::Begin("Player list");
 			if (ImGui::Button("Clear")) {
 				PlayerControllerList.clear();
-				CurrentIdx = -1;       ///// bbbbbbbbbbbaaaaaaaadddddddddd iiiiiiddddddddeeeeeeeeeeaaaaaaaaa
+				CurrentIdx = 0;
 			}
 
 			if (ImGui::BeginListBox("PlayerControllerDataListBox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
@@ -141,17 +132,14 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 					int cnt = 0;
 					const bool is_selected = (CurrentIdx == cnt);
-					playerInfo player;
-					player.update(*ListIterator);
+					static playerInfo player;
+					player.update(*ListIterator); // wrong reference == cause crash
 
-					if(ImGui::Selectable(player.nickname,is_selected))
-						CurrentIdx = cnt;
-						
-					if (is_selected) {
+					if (ImGui::Selectable(player.nickname, is_selected)) {
 						ImGui::SetItemDefaultFocus();
-						appLog.AddLog(u8"[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRole: %d\n",
-													*ListIterator, player.nickname, player.isPlayerRoleSet ? "True" : "False", player.playerRole);
-						CurrentIdx = -1;
+						CurrentIdx = cnt;
+						appLog.AddLog(u8"[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRole: %s\ninVent: %s\nisGhost: %s\nisInfected :%s\nisLocal: %s\nisSilenced: %s\nisSpectator: %s\n",
+							*ListIterator, player.nickname, player.isPlayerRoleSet ? "True" : "False", retRole(player.playerRole), player.inVent ? "True" : "False", player.isGhost ? "True" : "False", player.isInfected ? "True" : "False", player.isLocal ? "True" : "False", player.isSilenced ? "True" : "False", player.isSpectator ? "True" : "False");
 					}
 					cnt++;
 				}
@@ -176,10 +164,10 @@ void MainFunc(HMODULE hModule) {
 		// the index of the required function can be found in the METHODSTABLE.txt
 		kiero::bind(8, (void**)&oPre, hkPre);
 
-		oFlip = (tFlip)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA); // GameAssembly.dll+RVA
-
-		MH_CreateHook(oFlip, hkFlip, NULL); // A big problem. without third param, it should be very very very very laggy on every flip event.
-		MH_EnableHook(oFlip);
+		if (MH_CreateHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK 
+			|| MH_EnableHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA)) != MH_OK) {
+			appLog.AddLog("[Error] Can't create or enable Flip hook.");
+		}
 	}
 }
 

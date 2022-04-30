@@ -5,3 +5,5 @@
 #include <Psapi.h>
 
 DWORD_PTR GetGameAssemblyBase();
+
+const char* retRole(int roleId);

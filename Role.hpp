@@ -1,5 +1,5 @@
 // !! means that the information has not been collected yet.
-
+// Outdated. New career added.
 #pragma once
 
 namespace roles {
@@ -50,7 +50,7 @@ namespace roles {
 		constexpr int Vulture = 0x10;
 		constexpr int Falcon = 0x18;
 		constexpr int Dodo = 0x3;
-		constexpr int NoRole = 0x0;
+		constexpr int NoRole = -1;
 
 	}
 

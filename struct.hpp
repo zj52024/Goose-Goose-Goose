@@ -83,7 +83,7 @@ struct ExampleAppLog
 struct playerInfo {
 	bool isSilenced = false;
 	bool isInfected = false;
-	int playerRole = 0;
+	int playerRole = -1;
 	bool isPlayerRoleSet = false;
 	bool inVent = false;
 	bool hasBomb = false;
@@ -108,11 +108,16 @@ struct playerInfo {
 		isRemoteSpectating = false;
 	}
 
+	void init(DWORD_PTR PlayerController);
+
 	void update(DWORD_PTR PlayerController) {
 
 		wchar_t tmpNick[17] = L"";
 
-		memcpy(tmpNick, (DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14), sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
+		memcpy(tmpNick, 
+			(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14), 
+			sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
+
 		int len = WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL);
 		WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, len, NULL, NULL);
 
@@ -129,8 +134,8 @@ struct playerInfo {
 			hasBomb = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::hasBomb);
 			isGhost = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isGhost);
 			isLocal = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isLocal);
-			invisibilityDistance = GET_INT_VALUE(GooseGooseDuck::PlayerController::invisibilityDistance);
 			isSpectator = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSpectator);
+			invisibilityDistance = GET_INT_VALUE(GooseGooseDuck::PlayerController::invisibilityDistance);
 			isRemoteSpectating = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isRemoteSpectating);
 		}
 #undef GET_BOOL_VALUE
