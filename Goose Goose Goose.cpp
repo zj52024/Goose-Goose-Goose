@@ -22,7 +22,7 @@ using namespace std;
 
 typedef HRESULT(WINAPI* PRESENT)(IDXGISwapChain*, UINT, UINT);
 typedef LRESULT(WINAPI* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
-typedef void*(_stdcall* tFlip)(void* PlayerController, int someval1, int someval2, void* PhotonData); // void Flip(PlayerController this, int NBPPNBKBMNF, int JMAHGLDEHHB, PhotonMessageInfo BJMKOJJELHA){}
+typedef void* (_stdcall* tFlip)(void* PlayerController, int someval1, int someval2, void* PhotonData); // void Flip(PlayerController this, int NBPPNBKBMNF, int JMAHGLDEHHB, PhotonMessageInfo BJMKOJJELHA){}
 
 ExampleAppLog appLog;
 
@@ -49,7 +49,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return false;
 	}
 
-	if (canRender){
+	if (canRender) {
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 		return true;
 	}
@@ -113,6 +113,8 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 		static int CurrentIdx = -1;
 
+		if (PlayerControllerList.size() > 16) PlayerControllerList.clear();
+
 		{
 			ImGui::Begin("Log window");
 			ImGui::End();
@@ -120,26 +122,34 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		}
 
 		{
+			static playerInfo player[16]; // max player is 16.
+			static int cnt = 0;
 			ImGui::Begin("Player list");
+
 			if (ImGui::Button("Clear")) {
 				PlayerControllerList.clear();
 				CurrentIdx = 0;
 			}
 
+			ImGui::SameLine();
+			if (ImGui::Button("All roles")) {
+				for (int i = 0; i < PlayerControllerList.size(); i++) {
+					appLog.AddLog("[player info] Name: %s\t\tRole: %s\n",player[i].nickname, retRole(player[i].playerRole));
+				}
+			}
+
 			if (ImGui::BeginListBox("PlayerControllerDataListBox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+				cnt = 0;
 
 				for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
-
-					int cnt = 0;
 					const bool is_selected = (CurrentIdx == cnt);
-					static playerInfo player;
-					player.update(*ListIterator); // wrong reference == cause crash
+					player[cnt].update(*ListIterator); // wrong reference == cause crash
 
-					if (ImGui::Selectable(player.nickname, is_selected)) {
+					if (ImGui::Selectable(player[cnt].nickname, is_selected)) {
 						ImGui::SetItemDefaultFocus();
 						CurrentIdx = cnt;
-						appLog.AddLog(u8"[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRole: %s\ninVent: %s\nisGhost: %s\nisInfected :%s\nisLocal: %s\nisSilenced: %s\nisSpectator: %s\n",
-							*ListIterator, player.nickname, player.isPlayerRoleSet ? "True" : "False", retRole(player.playerRole), player.inVent ? "True" : "False", player.isGhost ? "True" : "False", player.isInfected ? "True" : "False", player.isLocal ? "True" : "False", player.isSilenced ? "True" : "False", player.isSpectator ? "True" : "False");
+						appLog.AddLog(u8"\n[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRole: %s\ninVent: %s\nisGhost: %s\nisInfected :%s\nisLocal: %s\nisSilenced: %s\nisSpectator: %s\n",
+							player[cnt].ptrPlayerController, player[cnt].nickname, player[cnt].isPlayerRoleSet ? "True" : "False", retRole(player[cnt].playerRole), player[cnt].inVent ? "True" : "False", player[cnt].isGhost ? "True" : "False", player[cnt].isInfected ? "True" : "False", player[cnt].isLocal ? "True" : "False", player[cnt].isSilenced ? "True" : "False", player[cnt].isSpectator ? "True" : "False");
 					}
 					cnt++;
 				}
@@ -164,7 +174,7 @@ void MainFunc(HMODULE hModule) {
 		// the index of the required function can be found in the METHODSTABLE.txt
 		kiero::bind(8, (void**)&oPre, hkPre);
 
-		if (MH_CreateHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK 
+		if (MH_CreateHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK
 			|| MH_EnableHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA)) != MH_OK) {
 			appLog.AddLog("[Error] Can't create or enable Flip hook.");
 		}
@@ -189,4 +199,3 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	return TRUE;
 }
-

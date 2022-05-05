@@ -81,6 +81,7 @@ struct ExampleAppLog
 };
 
 struct playerInfo {
+	DWORD_PTR ptrPlayerController = 0;
 	bool isSilenced = false;
 	bool isInfected = false;
 	int playerRole = -1;
@@ -95,9 +96,10 @@ struct playerInfo {
 	char nickname[17] = "";
 
 	void reset() {
+		ptrPlayerController = 0;
 		isSilenced = false;
 		isInfected = false;
-		playerRole = 0;
+		playerRole = -1;
 		isPlayerRoleSet = false;
 		inVent = false;
 		hasBomb = false;
@@ -106,39 +108,40 @@ struct playerInfo {
 		invisibilityDistance = 0;
 		isSpectator = false;
 		isRemoteSpectating = false;
+		nickname[17] = {};
 	}
 
-	void init(DWORD_PTR PlayerController);
-
 	void update(DWORD_PTR PlayerController) {
+		if (ptrPlayerController != PlayerController) {
+			ptrPlayerController = PlayerController;
+			wchar_t tmpNick[17] = L"";
 
-		wchar_t tmpNick[17] = L"";
+			memcpy(tmpNick,
+				(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14),
+				sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
 
-		memcpy(tmpNick, 
-			(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14), 
-			sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
-
-		int len = WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL);
-		WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, len, NULL, NULL);
+			int len = WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL);
+			WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, len, NULL, NULL);
 
 #define GET_BOOL_VALUE(X) *(bool*)(PlayerController+X)
 #define GET_INT_VALUE(X) *(int*)(PlayerController+X)
 
-		isPlayerRoleSet = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isPlayerRoleSet);
+			isPlayerRoleSet = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isPlayerRoleSet);
 
-		if (isPlayerRoleSet) {
-			isSilenced = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSilenced);
-			isInfected = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isInfected);
-			playerRole = *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerRole) + 0x10);
-			inVent = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::inVent);
-			hasBomb = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::hasBomb);
-			isGhost = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isGhost);
-			isLocal = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isLocal);
-			isSpectator = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSpectator);
-			invisibilityDistance = GET_INT_VALUE(GooseGooseDuck::PlayerController::invisibilityDistance);
-			isRemoteSpectating = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isRemoteSpectating);
-		}
+			if (isPlayerRoleSet) {
+				isSilenced = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSilenced);
+				isInfected = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isInfected);
+				playerRole = *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerRole) + 0x10);
+				inVent = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::inVent);
+				hasBomb = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::hasBomb);
+				isGhost = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isGhost);
+				isLocal = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isLocal);
+				isSpectator = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSpectator);
+				invisibilityDistance = GET_INT_VALUE(GooseGooseDuck::PlayerController::invisibilityDistance);
+				isRemoteSpectating = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isRemoteSpectating);
+			}
 #undef GET_BOOL_VALUE
 #undef GET_INT_VALUE
+		}
 	}
 };

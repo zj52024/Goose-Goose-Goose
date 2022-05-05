@@ -56,9 +56,12 @@
     <ClInclude Include="struct.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="drawer.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="Goose Goose Goose.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="utils.cpp">
@@ -87,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="drawer.cpp">
+      <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
