@@ -1,5 +1,4 @@
 ﻿#include "utils.hpp"
-#include "offsets.hpp"
 #include "struct.hpp"
 
 #include "MinHook/include/MinHook.h"
@@ -9,9 +8,6 @@
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <tchar.h>
 #include <d3d11.h>
 #include <iostream>
 #include <list>
@@ -128,13 +124,14 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 			if (ImGui::Button("Clear")) {
 				PlayerControllerList.clear();
+				for (int i = 0; i < PlayerControllerList.size(); i++) { player[i].reset(); }
 				CurrentIdx = 0;
 			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("All roles")) {
 				for (int i = 0; i < PlayerControllerList.size(); i++) {
-					appLog.AddLog("[player info] Name: %s\t\tRole: %s\n",player[i].nickname, retRole(player[i].playerRole));
+					appLog.AddLog("[player info] Name: %s\t\tRole: %s\n",player[i].nickname, player[i].roleName);
 				}
 			}
 
@@ -148,8 +145,8 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 					if (ImGui::Selectable(player[cnt].nickname, is_selected)) {
 						ImGui::SetItemDefaultFocus();
 						CurrentIdx = cnt;
-						appLog.AddLog(u8"\n[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRole: %s\ninVent: %s\nisGhost: %s\nisInfected :%s\nisLocal: %s\nisSilenced: %s\nisSpectator: %s\n",
-							player[cnt].ptrPlayerController, player[cnt].nickname, player[cnt].isPlayerRoleSet ? "True" : "False", retRole(player[cnt].playerRole), player[cnt].inVent ? "True" : "False", player[cnt].isGhost ? "True" : "False", player[cnt].isInfected ? "True" : "False", player[cnt].isLocal ? "True" : "False", player[cnt].isSilenced ? "True" : "False", player[cnt].isSpectator ? "True" : "False");
+						appLog.AddLog(u8"\n[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRoleName: %s\ninVent: %s\nisGhost: %s\nisInfected :%s\nisLocal: %s\nisSilenced: %s\nisSpectator: %s\n",
+							player[cnt].ptrPlayerController, player[cnt].nickname, player[cnt].isPlayerRoleSet ? "True" : "False", player[cnt].roleName, player[cnt].inVent ? "True" : "False", player[cnt].isGhost ? "True" : "False", player[cnt].isInfected ? "True" : "False", player[cnt].isLocal ? "True" : "False", player[cnt].isSilenced ? "True" : "False", player[cnt].isSpectator ? "True" : "False");
 					}
 					cnt++;
 				}

@@ -44,7 +44,7 @@ namespace roles {
 
 	}
 
-	namespace special {
+	namespace Neutrality {
 
 		constexpr int Pigeon = 0x15;
 		constexpr int Vulture = 0x10;
@@ -62,4 +62,27 @@ namespace roles {
 
 	}
 
+}
+
+namespace colors{
+	constexpr int red = 0;
+	constexpr int blue = 1;
+	constexpr int yellow = 2;
+	constexpr int green = 3;
+	constexpr int powerderPink = 4;
+	constexpr int orange = 5;
+	constexpr int paleBrown = 6;
+	constexpr int white = 7;
+	constexpr int darkGray = 8;
+	constexpr int purple = 9;
+	constexpr int lime = 10;
+	constexpr int skyBlue = 11;
+	constexpr int pink = 12;
+	constexpr int gray = 13;
+	constexpr int brown = 14;
+	constexpr int darkNavy = 15;
+	constexpr int olive = 16;
+	constexpr int black = 17;
+	constexpr int wineRed = 18;
+	constexpr int beige = 19;
 }

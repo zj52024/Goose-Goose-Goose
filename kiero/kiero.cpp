@@ -1,7 +1,6 @@
 #include "kiero.h"
 #include <Windows.h>
 #include <assert.h>
-//#include <stdio.h>
 
 #if KIERO_INCLUDE_D3D9
 # include <d3d9.h>
@@ -687,9 +686,6 @@ kiero::Status::Enum kiero::bind(uint16_t _index, void** _original, void* _functi
 	{
 #if KIERO_USE_MINHOOK
 		void* target = (void*)g_methodsTable[_index];
-		/*FILE* fp = fopen("C:\\Users\\kim\\Desktop\\log.txt", "w");
-		fprintf(fp, "target: %p\noriginal: %p\nfunction: %p\n", target, _original, _function);
-		fclose(fp);*/
 		if (MH_CreateHook(target, _function, _original) != MH_OK || MH_EnableHook(target) != MH_OK)
 		{
 			return Status::UnknownError;

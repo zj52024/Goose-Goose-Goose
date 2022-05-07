@@ -14,7 +14,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Role.hpp">
+    <ClInclude Include="GameData.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="utils.hpp">
@@ -56,9 +56,6 @@
     <ClInclude Include="struct.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="drawer.hpp">
-      <Filter>Header files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Goose Goose Goose.cpp">
@@ -90,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="drawer.cpp">
-      <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

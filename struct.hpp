@@ -1,4 +1,5 @@
 #include "imgui/imgui.h"
+#include "offsets.hpp"
 
 // from imgui_demo.cpp
 struct ExampleAppLog
@@ -84,7 +85,7 @@ struct playerInfo {
 	DWORD_PTR ptrPlayerController = 0;
 	bool isSilenced = false;
 	bool isInfected = false;
-	int playerRole = -1;
+	int playerRoleId = -1;
 	bool isPlayerRoleSet = false;
 	bool inVent = false;
 	bool hasBomb = false;
@@ -94,12 +95,13 @@ struct playerInfo {
 	bool isSpectator = false;
 	bool isRemoteSpectating = false;
 	char nickname[17] = "";
+	char roleName[64] = "";
 
 	void reset() {
 		ptrPlayerController = 0;
 		isSilenced = false;
 		isInfected = false;
-		playerRole = -1;
+		playerRoleId = -1;
 		isPlayerRoleSet = false;
 		inVent = false;
 		hasBomb = false;
@@ -108,20 +110,28 @@ struct playerInfo {
 		invisibilityDistance = 0;
 		isSpectator = false;
 		isRemoteSpectating = false;
-		nickname[17] = {};
+		nickname[0] = '\0';
+		roleName[0] = '\0';
+		//memcpy(nickname, '\0', 17);
 	}
 
 	void update(DWORD_PTR PlayerController) {
 		if (ptrPlayerController != PlayerController) {
 			ptrPlayerController = PlayerController;
-			wchar_t tmpNick[17] = L"";
+			wchar_t tmpNick[42] = L"";
+			wchar_t tmpRoleName[128] = L"";
 
 			memcpy(tmpNick,
 				(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14),
-				sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
+				 sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
 
-			int len = WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL);
-			WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, len, NULL, NULL);
+			memcpy(tmpRoleName,
+				(DWORD_PTR*)(*(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerNameRoleText) + GooseGooseDuck::PlayerController::m_text) + 0x14),
+				sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerNameRoleText) + GooseGooseDuck::PlayerController::m_text) + 0x10)
+			);
+
+			WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL), NULL, NULL);
+			WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, roleName, WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, NULL, 0, NULL, NULL), NULL, NULL);
 
 #define GET_BOOL_VALUE(X) *(bool*)(PlayerController+X)
 #define GET_INT_VALUE(X) *(int*)(PlayerController+X)
@@ -131,7 +141,7 @@ struct playerInfo {
 			if (isPlayerRoleSet) {
 				isSilenced = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSilenced);
 				isInfected = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isInfected);
-				playerRole = *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerRole) + 0x10);
+				playerRoleId = *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerRoleId) + 0x10);
 				inVent = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::inVent);
 				hasBomb = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::hasBomb);
 				isGhost = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isGhost);

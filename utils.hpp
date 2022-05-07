@@ -1,9 +1,21 @@
+//https://github.com/jjuiddong/Introduction-to-3D-Game-Programming-With-DirectX11/blob/master/Chapter%206%20Drawing%20in%20Direct3D/Box/BoxDemo.cpp
+//https://github.com/guided-hacking/GH_D3D11_Hook/tree/master/GH_D3D11_Hook
+
+// Use gdi+ before understand codes.
+
 #pragma once
-#define WIN32_LEAN_AND_MEAN
+
+#include "GameData.hpp"
+
+//#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <tchar.h>
 #include <Psapi.h>
+#include <gdiplus.h>
+
+#pragma comment(lib, "gdiplus")
 
 DWORD_PTR GetGameAssemblyBase();
 
-const char* retRole(int roleId);
+void drawBox(int x, int y, int width, int height, int roleType);
+void drawLine(int x1, int y1, int x2, int y2, int roleType);

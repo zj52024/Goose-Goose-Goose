@@ -3,7 +3,7 @@ namespace GooseGooseDuck {
 		constexpr int flipRVA = 0x16BD070; // Use AOBScan
 		constexpr int isSilenced = 185; // Boolean
 		constexpr int isInfected = 187; // Boolean
-		constexpr int playerRole = 224; // pointer, [instance+playerRole] + 0x10, int
+		constexpr int playerRoleId = 224; // pointer, [instance+playerRoleId] + 0x10, int
 		constexpr int isPlayerRoleSet = 232; // Boolean
 		constexpr int inVent = 233; // Boolean
 		constexpr int hasBomb = 282; // Boolean
@@ -13,5 +13,7 @@ namespace GooseGooseDuck {
 		constexpr int invisibilityDistance = 740; // int, need this?
 		constexpr int isSpectator = 818; // Boolean
 		constexpr int isRemoteSpectating = 819; // Boolean
+		constexpr int playerNameRoleText = 264; // pointer 
+		constexpr int m_text = 216; // c# string   length: [[playerController+playerNameRoleText] + 216] + 0x10    string: [[playerController+playerNameRoleText] + 216] + 0x14
 	}
 }
