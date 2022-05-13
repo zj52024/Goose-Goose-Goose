@@ -109,7 +109,11 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 		static int CurrentIdx = -1;
 
-		if (PlayerControllerList.size() > 16) PlayerControllerList.clear();
+		if (PlayerControllerList.size() > 16)
+		{
+			PlayerControllerList.clear();
+			for (int i = 0; i < PlayerControllerList.size(); i++) {player[i].reset();}				     
+		}
 
 		{
 			ImGui::Begin("Log window");
