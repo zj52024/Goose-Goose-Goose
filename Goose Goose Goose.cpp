@@ -88,7 +88,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesThai());
 
 			ImGui_ImplWin32_Init(FindWindow(0, L"Goose Goose Duck"));
 			ImGui_ImplDX11_Init(pDevice, pContext);
@@ -112,7 +112,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		if (PlayerControllerList.size() > 16)
 		{
 			PlayerControllerList.clear();
-			for (int i = 0; i < PlayerControllerList.size(); i++) {player[i].reset();}				     
+
 		}
 
 		{
@@ -135,7 +135,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			ImGui::SameLine();
 			if (ImGui::Button("All roles")) {
 				for (int i = 0; i < PlayerControllerList.size(); i++) {
-					appLog.AddLog("[player info] Name: %s\t\tRole: %s\n",player[i].nickname, player[i].roleName);
+					appLog.AddLog("[player info] Name: %s\t\tRole: %s\n", player[i].nickname, player[i].roleName);
 				}
 			}
 
