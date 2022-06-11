@@ -1,19 +1,19 @@
 namespace GooseGooseDuck {
 	namespace PlayerController {
-		constexpr int flipRVA = 0x16BD070; // Use AOBScan
-		constexpr int isSilenced = 185; // Boolean
-		constexpr int isInfected = 187; // Boolean
-		constexpr int playerRoleId = 224; // pointer, [instance+playerRoleId] + 0x10, int
-		constexpr int isPlayerRoleSet = 232; // Boolean
-		constexpr int inVent = 233; // Boolean
-		constexpr int hasBomb = 282; // Boolean
-		constexpr int isGhost = 360; // Boolean
-		constexpr int isLocal = 408; // Boolean
-		constexpr int nickname = 424; // pointer, [instance+nickname] +  0x14, length: [instance+nickname] + 0x10
-		constexpr int invisibilityDistance = 740; // int, need this?
-		constexpr int isSpectator = 818; // Boolean
-		constexpr int isRemoteSpectating = 819; // Boolean
-		constexpr int playerNameRoleText = 264; // pointer 
+		constexpr int flipRVA = 0x1809A50; // Use AOBScan
+		constexpr int isSilenced = 0xB9; // Boolean
+		constexpr int isInfected = 0xBB; // Boolean
+		constexpr int playerRoleId = 0xE0; // pointer, [instance+playerRoleId] + 0x10, int
+		constexpr int isPlayerRoleSet = 0xE8; // Boolean
+		constexpr int inVent = 0xE9; // Boolean
+		constexpr int hasBomb = 0x11A; // Boolean
+		constexpr int isGhost = 0x168; // Boolean
+		constexpr int isLocal = 0x198; // Boolean
+		constexpr int nickname = 0x1A8; // pointer, [instance+nickname] +  0x14, length: [instance+nickname] + 0x10
+		constexpr int invisibilityDistance = 0x304; // int, need this?
+		constexpr int isSpectator = 0x352; // Boolean
+		constexpr int isRemoteSpectating = 0x353; // Boolean
+		constexpr int playerNameRoleText = 0x108; // pointer 
 		constexpr int m_text = 216; // c# string   length: [[playerController+playerNameRoleText] + 216] + 0x10    string: [[playerController+playerNameRoleText] + 216] + 0x14
 	}
 }
