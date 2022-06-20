@@ -97,7 +97,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
 			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesThai());
-
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 			ImGui_ImplWin32_Init(FindWindow(0, L"Goose Goose Duck"));
 			ImGui_ImplDX11_Init(pDevice, pContext);
 
