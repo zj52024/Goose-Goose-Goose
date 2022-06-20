@@ -1,12 +1,12 @@
 namespace GooseGooseDuck {
 	namespace PlayerController {
-		constexpr int flipRVA = 0x1809A50; // Use AOBScan
+		constexpr int flipRVA = 0x1894470; // Use AOBScan
 		constexpr int isSilenced = 0xB9; // Boolean
 		constexpr int isInfected = 0xBB; // Boolean
 		constexpr int playerRoleId = 0xE0; // pointer, [instance+playerRoleId] + 0x10, int
 		constexpr int isPlayerRoleSet = 0xE8; // Boolean
 		constexpr int inVent = 0xE9; // Boolean
-		constexpr int hasBomb = 0x11A; // Boolean
+		constexpr int hasBomb = 0x11B; // Boolean
 		constexpr int isGhost = 0x168; // Boolean
 		constexpr int isLocal = 0x198; // Boolean
 		constexpr int nickname = 0x1A8; // pointer, [instance+nickname] +  0x14, length: [instance+nickname] + 0x10
