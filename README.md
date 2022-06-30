@@ -18,7 +18,7 @@ Free open-source cheat software for **Goose Goose Duck**
 
 ## So, how to use?
 
-Just complie it, and inject with your favorite injector.
+Just complie it with Visual Studio 2019, and inject with your favorite injector.
 
 ## Features
 

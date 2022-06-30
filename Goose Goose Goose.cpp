@@ -19,11 +19,13 @@ using namespace std;
 typedef HRESULT(WINAPI* PRESENT)(IDXGISwapChain*, UINT, UINT);
 typedef LRESULT(WINAPI* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef void* (_stdcall* tFlip)(void* PlayerController, int someval1, int someval2, void* PhotonData); // void Flip(PlayerController this, int NBPPNBKBMNF, int JMAHGLDEHHB, PhotonMessageInfo BJMKOJJELHA){}
+typedef void* (_stdcall* tUpdate)(void* PlayerController);
 
 ExampleAppLog appLog;
 
 void* myPlayerController = nullptr; // Handlers.GameHandlers.PlayerHandlers.PlayerController
 tFlip oFlip; // RVA = "0x192A290"          AOBScan?
+tUpdate oUpdate;
 
 PRESENT oPre = NULL;
 WNDPROC oWndproc = NULL;
@@ -37,6 +39,8 @@ bool canRender = true;
 
 list<DWORD_PTR> PlayerControllerList;
 list<DWORD_PTR>::iterator ListIterator;
+
+static playerInfo player[16]; // max player is 16.
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
@@ -73,6 +77,18 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 	}
 
 	return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
+}
+
+tUpdate hkUpdate(void* PlayerController) 
+{
+	int cnt = 0;
+
+	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
+		player[cnt].updatePosition(*ListIterator);
+		cnt++;
+	}
+
+	return (tUpdate)oUpdate(PlayerController);
 }
 
 HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
@@ -129,7 +145,6 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		}
 
 		{
-			static playerInfo player[16]; // max player is 16.
 			static int cnt = 0;
 			ImGui::Begin("Player list");
 
@@ -166,7 +181,8 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 							"isInfected :%s\n"
 							"isLocal: %s\n"
 							"isSilenced: %s\n"
-							"isSpectator: %s\n",
+							"isSpectator: %s\n"
+							"position X: %f, Y: %f\n",
 							player[cnt].ptrPlayerController, 
 							player[cnt].nickname,
 							player[cnt].isPlayerRoleSet ? "True" : "False", 
@@ -176,7 +192,9 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 							player[cnt].isInfected ? "True" : "False", 
 							player[cnt].isLocal ? "True" : "False", 
 							player[cnt].isSilenced ? "True" : "False", 
-							player[cnt].isSpectator ? "True" : "False");
+							player[cnt].isSpectator ? "True" : "False",
+							player[cnt].pos.x,
+							player[cnt].pos.y);
 					}
 					cnt++;
 				}
@@ -201,9 +219,14 @@ void MainFunc(HMODULE hModule) {
 		// the index of the required function can be found in the METHODSTABLE.txt
 		kiero::bind(8, (void**)&oPre, hkPre);
 
-		if (MH_CreateHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK
-			|| MH_EnableHook((void*)(GetGameAssemblyBase() + GooseGooseDuck::PlayerController::flipRVA)) != MH_OK) {
+		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK
+			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::flipRVA)) != MH_OK) {
 			appLog.AddLog("[Error] Can't create or enable Flip hook.");
+		}
+
+		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA), hkUpdate, (void**)&oUpdate) != MH_OK
+			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA)) != MH_OK) {
+			appLog.AddLog("[Error] Can't create or enable Update hook.");
 		}
 	}
 }

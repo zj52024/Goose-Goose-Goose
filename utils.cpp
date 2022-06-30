@@ -1,7 +1,7 @@
 #include "utils.hpp"
 
 //https://stackoverflow.com/questions/26572459/c-get-module-base-address-for-64bit-application
-DWORD_PTR GetProcessBaseAddress(DWORD processID)
+DWORD_PTR GetProcessBaseAddress(DWORD processID, const wchar_t* targetModuleName)
 {
 	DWORD_PTR   baseAddress = 0;
 	HANDLE      processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
@@ -29,7 +29,7 @@ DWORD_PTR GetProcessBaseAddress(DWORD processID)
 					{
 						for (unsigned int i = 0; i < moduleCount; i++) {
 							GetModuleBaseName(processHandle, moduleArray[i], moduleName, 24);
-							if (wcscmp(moduleName, L"GameAssembly.dll") == 0) baseAddress = (DWORD_PTR)moduleArray[i];
+							if (wcscmp(moduleName, targetModuleName) == 0) baseAddress = (DWORD_PTR)moduleArray[i];
 						}
 					}
 					LocalFree(moduleArrayBytes);
@@ -43,9 +43,13 @@ DWORD_PTR GetProcessBaseAddress(DWORD processID)
 }
 
 
+void AOBScan(char* str) {
 
-DWORD_PTR GetGameAssemblyBase() {
-	return GetProcessBaseAddress(GetCurrentProcessId());
+}
+
+
+DWORD_PTR GetGameAssemblyBase(const wchar_t* targetModuleName) {
+	return GetProcessBaseAddress(GetCurrentProcessId(), targetModuleName);
 }
 
 static Gdiplus::Pen* white_pen = new Gdiplus::Pen(Gdiplus::Color(255, 255, 255, 255), 1); //		a r g b		For goose

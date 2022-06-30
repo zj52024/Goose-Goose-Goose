@@ -1,5 +1,5 @@
 // !! means that the information has not been collected yet.
-// Outdated. New career added.
+// Outdated. New roles added.
 #pragma once
 
 namespace roles {

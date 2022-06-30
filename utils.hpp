@@ -15,7 +15,7 @@
 
 #pragma comment(lib, "gdiplus")
 
-DWORD_PTR GetGameAssemblyBase();
+DWORD_PTR GetGameAssemblyBase(const wchar_t* targetModuleName);
 
 void drawBox(int x, int y, int width, int height, int roleType);
 void drawLine(int x1, int y1, int x2, int y2, int roleType);

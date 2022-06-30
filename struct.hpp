@@ -81,6 +81,11 @@ struct ExampleAppLog
 	}
 };
 
+struct positionXY {
+	float x = 0.0f;
+	float y = 0.0f;
+};
+
 struct playerInfo {
 	DWORD_PTR ptrPlayerController = 0;
 	bool isSilenced = false;
@@ -96,6 +101,7 @@ struct playerInfo {
 	bool isRemoteSpectating = false;
 	char nickname[17] = "";
 	char roleName[64] = "";
+	positionXY pos;
 
 	void reset() {
 		ptrPlayerController = 0;
@@ -113,6 +119,12 @@ struct playerInfo {
 		nickname[0] = '\0';
 		roleName[0] = '\0';
 		//memcpy(nickname, '\0', 17);
+		pos = { 0.0f, 0.0f };
+	}
+
+	void updatePosition(DWORD_PTR PlayerController) {
+		if(PlayerController == ptrPlayerController)
+			memcpy(&pos, (int*)(PlayerController + GooseGooseDuck::PlayerController::position), 8);
 	}
 
 	void update(DWORD_PTR PlayerController) {
@@ -132,6 +144,8 @@ struct playerInfo {
 
 			WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL), NULL, NULL);
 			WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, roleName, WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, NULL, 0, NULL, NULL), NULL, NULL);
+
+			memcpy(&pos, (int*)(PlayerController+GooseGooseDuck::PlayerController::position), 8);
 
 #define GET_BOOL_VALUE(X) *(bool*)(PlayerController+X)
 #define GET_INT_VALUE(X) *(int*)(PlayerController+X)
