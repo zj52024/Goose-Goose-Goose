@@ -61,8 +61,16 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 		if ((DWORD_PTR)PlayerController != *ListIterator) cnt++;
 	}
 
-	if (PlayerControllerList.size() == 0) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController); }
-	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt) { PlayerControllerList.push_back((DWORD_PTR)PlayerController); appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController); }
+	if (PlayerControllerList.size() == 0)
+	{
+		PlayerControllerList.push_back((DWORD_PTR)PlayerController);
+		//appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController);
+	}
+	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt)
+	{
+		PlayerControllerList.push_back((DWORD_PTR)PlayerController);
+		//appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController);
+	}
 
 	return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
 }
@@ -88,8 +96,8 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesThai());
 			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
-
 			ImGui_ImplWin32_Init(FindWindow(0, L"Goose Goose Duck"));
 			ImGui_ImplDX11_Init(pDevice, pContext);
 
@@ -112,7 +120,6 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		if (PlayerControllerList.size() > 16)
 		{
 			PlayerControllerList.clear();
-			for (int i = 0; i < PlayerControllerList.size(); i++) {player[i].reset();}				     
 		}
 
 		{
@@ -135,7 +142,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			ImGui::SameLine();
 			if (ImGui::Button("All roles")) {
 				for (int i = 0; i < PlayerControllerList.size(); i++) {
-					appLog.AddLog("[player info] Name: %s\t\tRole: %s\n",player[i].nickname, player[i].roleName);
+					appLog.AddLog("[Player Info] Name: %s\t\tRole: %s\n", player[i].nickname, player[i].roleName);
 				}
 			}
 
@@ -149,8 +156,27 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 					if (ImGui::Selectable(player[cnt].nickname, is_selected)) {
 						ImGui::SetItemDefaultFocus();
 						CurrentIdx = cnt;
-						appLog.AddLog(u8"\n[player info]\nPlayerController: %012llX\nNickname: %s\nisRoleSet: %s\nRoleName: %s\ninVent: %s\nisGhost: %s\nisInfected :%s\nisLocal: %s\nisSilenced: %s\nisSpectator: %s\n",
-							player[cnt].ptrPlayerController, player[cnt].nickname, player[cnt].isPlayerRoleSet ? "True" : "False", player[cnt].roleName, player[cnt].inVent ? "True" : "False", player[cnt].isGhost ? "True" : "False", player[cnt].isInfected ? "True" : "False", player[cnt].isLocal ? "True" : "False", player[cnt].isSilenced ? "True" : "False", player[cnt].isSpectator ? "True" : "False");
+						appLog.AddLog(u8"\n[Player Info]\n"
+							"PlayerController: %012llX\n"
+							"Nickname: %s\n"
+							"isRoleSet: %s\n"
+							"RoleName: %s\n"
+							"inVent: %s\n"
+							"isGhost: %s\n"
+							"isInfected :%s\n"
+							"isLocal: %s\n"
+							"isSilenced: %s\n"
+							"isSpectator: %s\n",
+							player[cnt].ptrPlayerController, 
+							player[cnt].nickname,
+							player[cnt].isPlayerRoleSet ? "True" : "False", 
+							player[cnt].roleName,
+							player[cnt].inVent ? "True" : "False", 
+							player[cnt].isGhost ? "True" : "False", 
+							player[cnt].isInfected ? "True" : "False", 
+							player[cnt].isLocal ? "True" : "False", 
+							player[cnt].isSilenced ? "True" : "False", 
+							player[cnt].isSpectator ? "True" : "False");
 					}
 					cnt++;
 				}

@@ -32,6 +32,7 @@ Just complie it, and inject with your favorite injector.
 - Visual Studio 2019 community
 - cheat engine 6.3.0.0 & Mono dissector
 - x64dbg
+- Il2cppDumper
 ## Doo Bee Doo Baaaaaaaaaaaaaaaaaaaaaa
 
 Reference
@@ -40,4 +41,5 @@ Reference
 - [TsudaKageyu / minhook](https://github.com/TsudaKageyu/minhook)
 - [ocornut / imgui](https://github.com/ocornut/imgui)
 - [stackoverflow - GetProcessBaseAddress](https://stackoverflow.com/questions/26572459/c-get-module-base-address-for-64bit-application)
+- [TFive - Il2CppDumper GUI](https://github.com/T5ive/Il2CppDumper-GUI)
 
