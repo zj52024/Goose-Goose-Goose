@@ -43,6 +43,7 @@ list<DWORD_PTR>::iterator ListIterator;
 static playerInfo player[16]; // max player is 16.
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	// Don't ignore closing window even the menu opened.
 
 	if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
 		canRender = !canRender;
@@ -79,7 +80,7 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 	return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
 }
 
-tUpdate hkUpdate(void* PlayerController) 
+tUpdate hkUpdate(void* PlayerController)
 {
 	int cnt = 0;
 
@@ -183,15 +184,15 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 							"isSilenced: %s\n"
 							"isSpectator: %s\n"
 							"position X: %f, Y: %f\n",
-							player[cnt].ptrPlayerController, 
+							player[cnt].ptrPlayerController,
 							player[cnt].nickname,
-							player[cnt].isPlayerRoleSet ? "True" : "False", 
+							player[cnt].isPlayerRoleSet ? "True" : "False",
 							player[cnt].roleName,
-							player[cnt].inVent ? "True" : "False", 
-							player[cnt].isGhost ? "True" : "False", 
-							player[cnt].isInfected ? "True" : "False", 
-							player[cnt].isLocal ? "True" : "False", 
-							player[cnt].isSilenced ? "True" : "False", 
+							player[cnt].inVent ? "True" : "False",
+							player[cnt].isGhost ? "True" : "False",
+							player[cnt].isInfected ? "True" : "False",
+							player[cnt].isLocal ? "True" : "False",
+							player[cnt].isSilenced ? "True" : "False",
 							player[cnt].isSpectator ? "True" : "False",
 							player[cnt].pos.x,
 							player[cnt].pos.y);
@@ -215,18 +216,32 @@ void MainFunc(HMODULE hModule) {
 	if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 	{
 
+		bool hooked = true;
+
 		// define KIERO_USE_MINHOOK must be 1
 		// the index of the required function can be found in the METHODSTABLE.txt
 		kiero::bind(8, (void**)&oPre, hkPre);
 
 		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK
 			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::flipRVA)) != MH_OK) {
-			appLog.AddLog("[Error] Can't create or enable Flip hook.");
+			appLog.AddLog("[Error] Can't create or enable Flip hook.\n");
+			hooked = false;
+		}
+		else {
+			appLog.AddLog("[Info] Successfully create and enable Flip hook.\n");
 		}
 
 		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA), hkUpdate, (void**)&oUpdate) != MH_OK
 			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA)) != MH_OK) {
-			appLog.AddLog("[Error] Can't create or enable Update hook.");
+			appLog.AddLog("[Error] Can't create or enable Update hook.\n");
+			hooked = false;
+		}
+		else {
+			appLog.AddLog("[Info] Successfully create and enable Update hook.\n");
+		}
+
+		if (hooked) {
+			appLog.AddLog("\n\nGoose Goose Goose, an open source program made by roy6307.\nYou can review codes on https://github.com/roy6307/Goose-Goose-Goose\n\n");
 		}
 	}
 }
