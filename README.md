@@ -1,4 +1,4 @@
-# Goose Goose Goose
+# Goose Goose Goose(OUTDATED | UTC+9 2022-07-09)
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 
