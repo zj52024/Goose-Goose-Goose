@@ -1,4 +1,4 @@
-# Goose Goose Goose(OUTDATED | UTC+9 2022-07-09)
+# Goose Goose Goose
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 
@@ -27,12 +27,19 @@ After the dll injected, press insert to turn on or turn off the cheat menu.
 
 - User & role list (working on)
 - Draw everyone's location on map (Scheduled)
-- GUI (Scheduled)
+- GUI
+- AOBScan for some offsets (Scheduled)
+
+
+## Known bug
+
+- When inject, the game crashed. Please wait for a moment and re-inject the dll.
+- After end the game or vote time, sometimes the game crashed. I don't know about this. If you know about this, please notice me.
 
 
 ## Used tools
 
-- Visual Studio 2019 community
+- Visual Studio 2022 community v17.3.3
 - cheat engine 6.3.0.0 & Mono dissector
 - x64dbg
 - Il2cppDumper
