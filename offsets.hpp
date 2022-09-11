@@ -19,7 +19,7 @@ namespace GooseGooseDuck {
 		constexpr int position = 0x2B0; // Value name is randomized. x, y. Float, Float
 		/*
 		[Notable offsets]
-		2A0, Player location, Float Float,   x, y
+		2B0, Player location, Float Float,   x, y
 		
 		*/
 	}

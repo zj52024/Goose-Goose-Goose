@@ -151,6 +151,7 @@ struct playerInfo {
 #define GET_INT_VALUE(X) *(int*)(PlayerController+X)
 
 			isPlayerRoleSet = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isPlayerRoleSet);
+			isLocal = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isLocal);
 
 			if (isPlayerRoleSet) {
 				isSilenced = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSilenced);
@@ -159,7 +160,6 @@ struct playerInfo {
 				inVent = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::inVent);
 				hasBomb = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::hasBomb);
 				isGhost = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isGhost);
-				isLocal = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isLocal);
 				isSpectator = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isSpectator);
 				invisibilityDistance = GET_INT_VALUE(GooseGooseDuck::PlayerController::invisibilityDistance);
 				isRemoteSpectating = GET_BOOL_VALUE(GooseGooseDuck::PlayerController::isRemoteSpectating);

@@ -36,11 +36,13 @@ ID3D11RenderTargetView* mainRenderTargetView;
 
 bool init = false;
 bool canRender = true;
+bool canDrawESP = true;
 
 list<DWORD_PTR> PlayerControllerList;
 list<DWORD_PTR>::iterator ListIterator;
 
 static playerInfo player[16]; // max player is 16.
+DWORD_PTR LocalPlayerController = 0;
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	// Don't ignore closing window even the menu opened.
@@ -61,7 +63,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonData) {
 
-	int cnt = 0;
+	// useless for now on.
+	/*int cnt = 0;
 	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
 		if ((DWORD_PTR)PlayerController != *ListIterator) cnt++;
 	}
@@ -75,16 +78,28 @@ tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonDat
 	{
 		PlayerControllerList.push_back((DWORD_PTR)PlayerController);
 		//appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController);
-	}
+	}*/
 
 	return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
 }
 
 tUpdate hkUpdate(void* PlayerController)
 {
+
+	if (*(bool*)((DWORD_PTR)PlayerController + GooseGooseDuck::PlayerController::isLocal))
+		LocalPlayerController = (DWORD_PTR)PlayerController;
+
+	static list<DWORD_PTR>::iterator tmpIter;
+	tmpIter = std::find(PlayerControllerList.begin(), PlayerControllerList.end(), (DWORD_PTR)(PlayerController));
+
+	if (tmpIter == PlayerControllerList.end()) {
+		PlayerControllerList.push_back((DWORD_PTR)PlayerController);
+	}
+
 	int cnt = 0;
 
 	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
+		player[cnt].update(*ListIterator); // wrong reference issue
 		player[cnt].updatePosition(*ListIterator);
 		cnt++;
 	}
@@ -126,81 +141,118 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			return oPre(pSC, SyncInterval, Flags);
 	}
 
-	if (canRender)
-	{
+	if (canRender || canDrawESP) {
+
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		static int CurrentIdx = -1;
-
-		if (PlayerControllerList.size() > 16)
+		if (canRender)
 		{
-			PlayerControllerList.clear();
-		}
 
-		{
-			ImGui::Begin("Log window");
-			ImGui::End();
-			appLog.Draw("Log window");
-		}
+			static int CurrentIdx = -1;
 
-		{
-			static int cnt = 0;
-			ImGui::Begin("Player list");
-
-			if (ImGui::Button("Clear")) {
+			if (PlayerControllerList.size() > 16)
+			{
 				PlayerControllerList.clear();
-				for (int i = 0; i < PlayerControllerList.size(); i++) { player[i].reset(); }
-				CurrentIdx = 0;
 			}
 
-			ImGui::SameLine();
-			if (ImGui::Button("All roles")) {
-				for (int i = 0; i < PlayerControllerList.size(); i++) {
-					appLog.AddLog("[Player Info] Name: %s\t\tRole: %s\n", player[i].nickname, player[i].roleName);
+			{
+				ImGui::Begin("Log window");
+				ImGui::End();
+				appLog.Draw("Log window");
+			}
+
+			{
+				static int cnt = 0;
+				ImGui::Begin("Player list");
+
+				if (ImGui::Button("Clear")) {
+					PlayerControllerList.clear();
+					for (int i = 0; i < PlayerControllerList.size(); i++) { player[i].reset(); }
+					CurrentIdx = 0;
 				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("All roles")) {
+					for (int i = 0; i < PlayerControllerList.size(); i++) {
+						appLog.AddLog("[Player Info] Name: %s\t\tRole: %s\n", player[i].nickname, player[i].roleName);
+					}
+				}
+
+				if (ImGui::BeginListBox("PlayerControllerDataListBox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+					cnt = 0;
+
+					for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
+						const bool is_selected = (CurrentIdx == cnt);
+						player[cnt].update(*ListIterator); // wrong reference == cause crash
+
+						if (ImGui::Selectable(player[cnt].nickname, is_selected)) {
+							ImGui::SetItemDefaultFocus();
+							CurrentIdx = cnt;
+							appLog.AddLog(u8"\n[Player Info]\n"
+								"PlayerController: %012llX\n"
+								"Nickname: %s\n"
+								"isRoleSet: %s\n"
+								"RoleName: %s\n"
+								"inVent: %s\n"
+								"isGhost: %s\n"
+								"isInfected :%s\n"
+								"isLocal: %s\n"
+								"isSilenced: %s\n"
+								"isSpectator: %s\n"
+								"position X: %f, Y: %f\n",
+								player[cnt].ptrPlayerController,
+								player[cnt].nickname,
+								player[cnt].isPlayerRoleSet ? "True" : "False",
+								player[cnt].roleName,
+								player[cnt].inVent ? "True" : "False",
+								player[cnt].isGhost ? "True" : "False",
+								player[cnt].isInfected ? "True" : "False",
+								player[cnt].isLocal ? "True" : "False",
+								player[cnt].isSilenced ? "True" : "False",
+								player[cnt].isSpectator ? "True" : "False",
+								player[cnt].pos.x,
+								player[cnt].pos.y);
+						}
+						cnt++;
+					}
+				}
+				ImGui::End();
 			}
 
-			if (ImGui::BeginListBox("PlayerControllerDataListBox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
-				cnt = 0;
+		}
 
-				for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
-					const bool is_selected = (CurrentIdx == cnt);
-					player[cnt].update(*ListIterator); // wrong reference == cause crash
+		if (canDrawESP) {
+			{
+				ImGui::SetNextWindowPos(ImVec2(0, 0));
+				ImGui::SetNextWindowSize(ImVec2(1280, 720)); // 640, 360
+				ImGui::Begin("Overlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground);
+				ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-					if (ImGui::Selectable(player[cnt].nickname, is_selected)) {
-						ImGui::SetItemDefaultFocus();
-						CurrentIdx = cnt;
-						appLog.AddLog(u8"\n[Player Info]\n"
-							"PlayerController: %012llX\n"
-							"Nickname: %s\n"
-							"isRoleSet: %s\n"
-							"RoleName: %s\n"
-							"inVent: %s\n"
-							"isGhost: %s\n"
-							"isInfected :%s\n"
-							"isLocal: %s\n"
-							"isSilenced: %s\n"
-							"isSpectator: %s\n"
-							"position X: %f, Y: %f\n",
-							player[cnt].ptrPlayerController,
-							player[cnt].nickname,
-							player[cnt].isPlayerRoleSet ? "True" : "False",
-							player[cnt].roleName,
-							player[cnt].inVent ? "True" : "False",
-							player[cnt].isGhost ? "True" : "False",
-							player[cnt].isInfected ? "True" : "False",
-							player[cnt].isLocal ? "True" : "False",
-							player[cnt].isSilenced ? "True" : "False",
-							player[cnt].isSpectator ? "True" : "False",
-							player[cnt].pos.x,
-							player[cnt].pos.y);
+				const ImU32 col = ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f));   //RGBA
+				int cnt = 0;
+				positionXY LocalPlayerPos = { 0.0f, 0.0f };
+
+
+				for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) { // local-based-relative calculation needed.
+
+					if (player[cnt].isLocal) {
+						//draw_list->AddRect(ImVec2(600, 310), ImVec2(675, 450), col, 0.0f, ImDrawFlags_None, 3.0f); // All visible things are resized in reverse proportion to local player speed
+						draw_list->AddLine(ImVec2(640- 5, 360), ImVec2(640 + 5, 360 + 10), ImColor(1.0f, 0.0f, 0.0f, 1.0f), 2.0f);
+					}
+					else {
+						float deltaX, deltaY;
+						memcpy(&LocalPlayerPos, (int*)(LocalPlayerController + GooseGooseDuck::PlayerController::position), 8);
+						
+						deltaX = player[cnt].pos.x - LocalPlayerPos.x;
+						deltaY = player[cnt].pos.y - LocalPlayerPos.y;
+
+						draw_list->AddLine(ImVec2(640, 360), ImVec2(640+deltaX*80, 360+deltaY*-80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
 					}
 					cnt++;
 				}
 			}
-			ImGui::End();
 		}
 
 		ImGui::Render();

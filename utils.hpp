@@ -1,8 +1,6 @@
 //https://github.com/jjuiddong/Introduction-to-3D-Game-Programming-With-DirectX11/blob/master/Chapter%206%20Drawing%20in%20Direct3D/Box/BoxDemo.cpp
 //https://github.com/guided-hacking/GH_D3D11_Hook/tree/master/GH_D3D11_Hook
 
-// Use gdi+ before understand codes.
-
 #pragma once
 
 #include "GameData.hpp"
@@ -11,8 +9,6 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <Psapi.h>
-#include <gdiplus.h>
 
-#pragma comment(lib, "gdiplus")
 
 DWORD_PTR GetGameAssemblyBase(const wchar_t* targetModuleName);
