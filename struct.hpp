@@ -99,7 +99,7 @@ struct playerInfo {
 	int invisibilityDistance = 0;
 	bool isSpectator = false;
 	bool isRemoteSpectating = false;
-	char nickname[17] = "";
+	char nickname[64] = "";
 	char roleName[64] = "";
 	positionXY pos;
 
@@ -123,7 +123,7 @@ struct playerInfo {
 	}
 
 	void updatePosition(DWORD_PTR PlayerController) {
-		if(PlayerController == ptrPlayerController)
+		if (PlayerController == ptrPlayerController)
 			memcpy(&pos, (int*)(PlayerController + GooseGooseDuck::PlayerController::position), 8);
 	}
 
@@ -135,7 +135,7 @@ struct playerInfo {
 
 			memcpy(tmpNick,
 				(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14),
-				 sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10));
+				sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10)+1); // endian issue....... I think..... Big->Littile....?
 
 			memcpy(tmpRoleName,
 				(DWORD_PTR*)(*(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerNameRoleText) + GooseGooseDuck::PlayerController::m_text) + 0x14),
@@ -145,7 +145,7 @@ struct playerInfo {
 			WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL), NULL, NULL);
 			WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, roleName, WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, NULL, 0, NULL, NULL), NULL, NULL);
 
-			memcpy(&pos, (int*)(PlayerController+GooseGooseDuck::PlayerController::position), 8);
+			memcpy(&pos, (int*)(PlayerController + GooseGooseDuck::PlayerController::position), 8);
 
 #define GET_BOOL_VALUE(X) *(bool*)(PlayerController+X)
 #define GET_INT_VALUE(X) *(int*)(PlayerController+X)

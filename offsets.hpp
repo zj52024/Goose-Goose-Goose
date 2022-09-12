@@ -15,12 +15,12 @@ namespace GooseGooseDuck {
 		constexpr int isSpectator = 0x362; // Boolean
 		constexpr int isRemoteSpectating = 0x363; // Boolean
 		constexpr int playerNameRoleText = 0x118; // pointer 
-		constexpr int m_text = 216; // c# string   length: [[playerController+playerNameRoleText] + 216] + 0x10    string: [[playerController+playerNameRoleText] + 216] + 0x14
+		constexpr int m_text = 0xD8; // c# string   length: [[playerController+playerNameRoleText] + 216] + 0x10    string: [[playerController+playerNameRoleText] + 216] + 0x14
 		constexpr int position = 0x2B0; // Value name is randomized. x, y. Float, Float
 		/*
 		[Notable offsets]
 		2B0, Player location, Float Float,   x, y
-		
+		2BC
 		*/
 	}
 }

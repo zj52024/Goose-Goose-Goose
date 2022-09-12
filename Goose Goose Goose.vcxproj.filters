@@ -56,6 +56,9 @@
     <ClInclude Include="struct.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="imgui_memory_editor.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Goose Goose Goose.cpp">

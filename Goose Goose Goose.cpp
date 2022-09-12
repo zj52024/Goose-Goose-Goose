@@ -7,6 +7,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
+#include "imgui_memory_editor.h"
 
 #include <d3d11.h>
 #include <iostream>
@@ -127,11 +128,12 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 			IMGUI_CHECKVERSION();
 			ImGui::CreateContext();
-			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesThai());
-			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 			ImGui_ImplWin32_Init(FindWindow(0, L"Goose Goose Duck"));
 			ImGui_ImplDX11_Init(pDevice, pContext);
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+			//io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesThai());
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 
 			ImGui::StyleColorsDark();
 
@@ -221,6 +223,11 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::End();
 			}
 
+			{
+				ImGui::Begin("ESP");
+				ImGui::Checkbox("Enable", &canDrawESP);
+			}
+
 		}
 
 		if (canDrawESP) {
@@ -239,7 +246,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 					if (player[cnt].isLocal) {
 						//draw_list->AddRect(ImVec2(600, 310), ImVec2(675, 450), col, 0.0f, ImDrawFlags_None, 3.0f); // All visible things are resized in reverse proportion to local player speed
-						draw_list->AddLine(ImVec2(640- 5, 360), ImVec2(640 + 5, 360 + 10), ImColor(1.0f, 0.0f, 0.0f, 1.0f), 2.0f);
+						draw_list->AddLine(ImVec2(640- 5, 360-10), ImVec2(640 + 5, 360 + 10), ImColor(1.0f, 0.0f, 0.0f, 1.0f), 2.0f);
 					}
 					else {
 						float deltaX, deltaY;
@@ -248,7 +255,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 						deltaX = player[cnt].pos.x - LocalPlayerPos.x;
 						deltaY = player[cnt].pos.y - LocalPlayerPos.y;
 
-						draw_list->AddLine(ImVec2(640, 360), ImVec2(640+deltaX*80, 360+deltaY*-80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
+						draw_list->AddLine(ImVec2(640, 330), ImVec2(640+deltaX*80, 360+deltaY*-80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
 					}
 					cnt++;
 				}
