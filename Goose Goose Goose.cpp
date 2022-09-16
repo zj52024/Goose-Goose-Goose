@@ -19,13 +19,10 @@ using namespace std;
 
 typedef HRESULT(WINAPI* PRESENT)(IDXGISwapChain*, UINT, UINT);
 typedef LRESULT(WINAPI* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
-typedef void* (_stdcall* tFlip)(void* PlayerController, int someval1, int someval2, void* PhotonData); // void Flip(PlayerController this, int NBPPNBKBMNF, int JMAHGLDEHHB, PhotonMessageInfo BJMKOJJELHA){}
 typedef void* (_stdcall* tUpdate)(void* PlayerController);
 
 ExampleAppLog appLog;
 
-void* myPlayerController = nullptr; // Handlers.GameHandlers.PlayerHandlers.PlayerController
-tFlip oFlip; // RVA = "0x192A290"          AOBScan?
 tUpdate oUpdate;
 
 PRESENT oPre = NULL;
@@ -37,7 +34,12 @@ ID3D11RenderTargetView* mainRenderTargetView;
 
 bool init = false;
 bool canRender = true;
+
 bool canDrawESP = true;
+bool drawLine = false;
+bool drawBox = false;
+bool showName = false;
+bool showRole = false;
 
 list<DWORD_PTR> PlayerControllerList;
 list<DWORD_PTR>::iterator ListIterator;
@@ -60,28 +62,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	return CallWindowProc(oWndproc, hWnd, uMsg, wParam, lParam);
 
-}
-
-tFlip hkFlip(void* PlayerController, int someval1, int someval2, void* PhotonData) {
-
-	// useless for now on.
-	/*int cnt = 0;
-	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) {
-		if ((DWORD_PTR)PlayerController != *ListIterator) cnt++;
-	}
-
-	if (PlayerControllerList.size() == 0)
-	{
-		PlayerControllerList.push_back((DWORD_PTR)PlayerController);
-		//appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController);
-	}
-	if (PlayerControllerList.size() != 0 && PlayerControllerList.size() == cnt)
-	{
-		PlayerControllerList.push_back((DWORD_PTR)PlayerController);
-		//appLog.AddLog("[info] Add new PlayerController: %12llX\n", (DWORD_PTR)PlayerController);
-	}*/
-
-	return (tFlip)oFlip(PlayerController, someval1, someval2, PhotonData);
 }
 
 tUpdate hkUpdate(void* PlayerController)
@@ -131,9 +111,20 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			ImGui_ImplWin32_Init(FindWindow(0, L"Goose Goose Duck"));
 			ImGui_ImplDX11_Init(pDevice, pContext);
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			// https://github.com/ocornut/imgui/blob/master/docs/FONTS.md#using-custom-glyph-ranges
+			ImVector<ImWchar> ranges;
+			ImFontGlyphRangesBuilder builder;
 
-			//io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesThai());
-			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+			builder.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+			builder.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+			builder.AddRanges(io.Fonts->GetGlyphRangesJapanese());
+			builder.AddRanges(io.Fonts->GetGlyphRangesKorean());
+			builder.AddRanges(io.Fonts->GetGlyphRangesThai());
+			builder.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
+			builder.BuildRanges(&ranges);
+
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, ranges.Data);
+			io.Fonts->Build();
 
 			ImGui::StyleColorsDark();
 
@@ -246,16 +237,33 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 					if (player[cnt].isLocal) {
 						//draw_list->AddRect(ImVec2(600, 310), ImVec2(675, 450), col, 0.0f, ImDrawFlags_None, 3.0f); // All visible things are resized in reverse proportion to local player speed
-						draw_list->AddLine(ImVec2(640- 5, 360-10), ImVec2(640 + 5, 360 + 10), ImColor(1.0f, 0.0f, 0.0f, 1.0f), 2.0f);
+						//draw_list->AddLine(ImVec2(640- 5, 360-10), ImVec2(640 + 5, 360 + 10), ImColor(1.0f, 0.0f, 0.0f, 1.0f), 2.0f);
 					}
 					else {
 						float deltaX, deltaY;
 						memcpy(&LocalPlayerPos, (int*)(LocalPlayerController + GooseGooseDuck::PlayerController::position), 8);
+						char* infoTexts = "";
+						char* roleID = "";
 						
 						deltaX = player[cnt].pos.x - LocalPlayerPos.x;
 						deltaY = player[cnt].pos.y - LocalPlayerPos.y;
 
-						draw_list->AddLine(ImVec2(640, 330), ImVec2(640+deltaX*80, 360+deltaY*-80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
+						if(drawLine)
+							draw_list->AddLine(ImVec2(640, 330), ImVec2(640+deltaX*80, 360+deltaY*-80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
+					
+						if(drawBox)
+							draw_list->AddRect(ImVec2(620+deltaX*80,325+deltaY*-80),ImVec2(660+deltaX*80,395+deltaY*-80),ImColor(0.5f,0.0f,0.0f,1.0f), 0.0f, 0, 2.0f);
+
+						if(showName)
+							strcat(infoTexts, player[cnt].nickname);
+
+						if(showRole)
+							sprintf(roleID, "%d", player[cnt].playerRoleId);
+
+						if(showName || showRole){
+							sprintf(infoTexts, "%s\n%s", infoTexts, roleID);
+							draw_list->AddText(ImVec2(640+deltaX*80, 310+deltaY*-80), ImColor(1.0f, 1.0f, 1.0f, 1.0f), infoTexts);
+						}
 					}
 					cnt++;
 				}
@@ -280,15 +288,6 @@ void MainFunc(HMODULE hModule) {
 		// define KIERO_USE_MINHOOK must be 1
 		// the index of the required function can be found in the METHODSTABLE.txt
 		kiero::bind(8, (void**)&oPre, hkPre);
-
-		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::flipRVA), hkFlip, (void**)&oFlip) != MH_OK
-			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::flipRVA)) != MH_OK) {
-			appLog.AddLog("[Error] Can't create or enable Flip hook.\n");
-			hooked = false;
-		}
-		else {
-			appLog.AddLog("[Info] Successfully create and enable Flip hook.\n");
-		}
 
 		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA), hkUpdate, (void**)&oUpdate) != MH_OK
 			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA)) != MH_OK) {
