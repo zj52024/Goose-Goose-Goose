@@ -10,5 +10,8 @@
 #include <tchar.h>
 #include <Psapi.h>
 
+struct Vector3 {
+	float x, y, z;
+};
 
 DWORD_PTR GetGameAssemblyBase(const wchar_t* targetModuleName);

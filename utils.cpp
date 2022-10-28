@@ -51,3 +51,7 @@ void AOBScan(char* str) {
 DWORD_PTR GetGameAssemblyBase(const wchar_t* targetModuleName) {
 	return GetProcessBaseAddress(GetCurrentProcessId(), targetModuleName);
 }
+
+float Vec3Slerp(Vector3 a, Vector3 b, float t) {
+
+}

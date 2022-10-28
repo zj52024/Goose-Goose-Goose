@@ -20,6 +20,11 @@ using namespace std;
 typedef HRESULT(WINAPI* PRESENT)(IDXGISwapChain*, UINT, UINT);
 typedef LRESULT(WINAPI* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef void* (_stdcall* tUpdate)(void* PlayerController);
+typedef void* (_stdcall* tCineDamp)(void* sth, Vector3 param1, Vector3 param2, float t);
+
+tCineDamp oCineDamp;
+Vector3 initial, dampTime;
+float deltaTime;
 
 ExampleAppLog appLog;
 
@@ -38,8 +43,7 @@ bool canRender = true;
 bool canDrawESP = true;
 bool drawLine = false;
 bool drawBox = false;
-bool showName = false;
-bool showRole = false;
+bool showPlayerInfo = false;
 
 list<DWORD_PTR> PlayerControllerList;
 list<DWORD_PTR>::iterator ListIterator;
@@ -86,6 +90,13 @@ tUpdate hkUpdate(void* PlayerController)
 	}
 
 	return (tUpdate)oUpdate(PlayerController);
+}
+
+tCineDamp hkCineDamp(void* somthing, Vector3 d_param1, Vector3 d_param2, float d_t) {
+	initial = d_param1;
+	dampTime = d_param2;
+	deltaTime = d_t;
+	return (tCineDamp)oCineDamp(somthing, d_param1, d_param2, d_t);
 }
 
 HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
@@ -217,6 +228,10 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			{
 				ImGui::Begin("ESP");
 				ImGui::Checkbox("Enable", &canDrawESP);
+				ImGui::Checkbox("Draw line", &drawLine);
+				ImGui::Checkbox("Draw box", &drawBox);
+				ImGui::Checkbox("Show players info", &showPlayerInfo);
+
 			}
 
 		}
@@ -233,36 +248,35 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				positionXY LocalPlayerPos = { 0.0f, 0.0f };
 
 
-				for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) { // local-based-relative calculation needed.
+				for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) { // local-based-relative calculation needed.  linear interpolation
 
-					if (player[cnt].isLocal) {
-						//draw_list->AddRect(ImVec2(600, 310), ImVec2(675, 450), col, 0.0f, ImDrawFlags_None, 3.0f); // All visible things are resized in reverse proportion to local player speed
-						//draw_list->AddLine(ImVec2(640- 5, 360-10), ImVec2(640 + 5, 360 + 10), ImColor(1.0f, 0.0f, 0.0f, 1.0f), 2.0f);
-					}
-					else {
+					if (!player[cnt].isLocal) 
+						{
 						float deltaX, deltaY;
 						memcpy(&LocalPlayerPos, (int*)(LocalPlayerController + GooseGooseDuck::PlayerController::position), 8);
-						char* infoTexts = "";
-						char* roleID = "";
-						
-						deltaX = player[cnt].pos.x - LocalPlayerPos.x;
-						deltaY = player[cnt].pos.y - LocalPlayerPos.y;
 
-						if(drawLine)
-							draw_list->AddLine(ImVec2(640, 330), ImVec2(640+deltaX*80, 360+deltaY*-80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
-					
-						if(drawBox)
-							draw_list->AddRect(ImVec2(620+deltaX*80,325+deltaY*-80),ImVec2(660+deltaX*80,395+deltaY*-80),ImColor(0.5f,0.0f,0.0f,1.0f), 0.0f, 0, 2.0f);
+						deltaX = player[cnt].pos.x - LocalPlayerPos.x + initial.x;
+						deltaY = player[cnt].pos.y - LocalPlayerPos.y - initial.y;
 
-						if(showName)
-							strcat(infoTexts, player[cnt].nickname);
+						if (drawLine)
+							draw_list->AddLine(ImVec2(640 + initial.x*80, 360 - initial.y*80), ImVec2(640 + deltaX * 80, 360 + deltaY * -80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
 
-						if(showRole)
-							sprintf(roleID, "%d", player[cnt].playerRoleId);
+						if (drawBox)
+							draw_list->AddRect(ImVec2(600 + deltaX * 80, 310 + deltaY * -80), ImVec2(680 + deltaX * 80, 450 + deltaY * -80), ImColor(0.5f, 0.0f, 0.0f, 1.0f), 0.0f, 0, 2.0f);
 
-						if(showName || showRole){
-							sprintf(infoTexts, "%s\n%s", infoTexts, roleID);
-							draw_list->AddText(ImVec2(640+deltaX*80, 310+deltaY*-80), ImColor(1.0f, 1.0f, 1.0f, 1.0f), infoTexts);
+						if (showPlayerInfo) {
+							char infoTexts[512];
+							if (!player[cnt].isGhost)
+								sprintf(infoTexts, u8"\n[Player Info]\n"
+									"Nickname: %s\n"
+									"inVent: %s\n"
+									"isInfected :%s\n"
+									"isSilenced: %s\n",
+									player[cnt].nickname,
+									player[cnt].inVent ? "True" : "False",
+									player[cnt].isInfected ? "True" : "False",
+									player[cnt].isSilenced ? "True" : "False");
+							draw_list->AddText(ImVec2(640 + deltaX * 80, 310 + deltaY * -80), ImColor(1.0f, 1.0f, 1.0f, 1.0f), infoTexts);
 						}
 					}
 					cnt++;
@@ -296,6 +310,15 @@ void MainFunc(HMODULE hModule) {
 		}
 		else {
 			appLog.AddLog("[Info] Successfully create and enable Update hook.\n");
+		}
+
+		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::cinemachine::damp), hkCineDamp, (void**)&oCineDamp) != MH_OK
+			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::cinemachine::damp)) != MH_OK) {
+			appLog.AddLog("[Error] Can't create or enable Damp hook.\n");
+			hooked = false;
+		}
+		else {
+			appLog.AddLog("[Info] Successfully create and enable Damp hook.\n");
 		}
 
 		if (hooked) {
