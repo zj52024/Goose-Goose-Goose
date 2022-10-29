@@ -1,5 +1,8 @@
+#pragma once
+
 #include "imgui/imgui.h"
 #include "offsets.hpp"
+#include <Windows.h>
 
 // from imgui_demo.cpp
 struct ExampleAppLog
@@ -84,6 +87,10 @@ struct ExampleAppLog
 struct positionXY {
 	float x = 0.0f;
 	float y = 0.0f;
+};
+
+struct Vector3 {
+	float x, y, z;
 };
 
 struct playerInfo {

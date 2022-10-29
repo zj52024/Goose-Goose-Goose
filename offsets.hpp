@@ -1,6 +1,13 @@
+#pragma once
+
 namespace GooseGooseDuck {
 	namespace cinemachine {
 		constexpr int damp = 0xD43340;   //Cinemachine.Utility.Damper.Damp(Vector3 initial, Vector3 dampTime, float deltaTime)
+	}
+
+	namespace GameManager { 	// Managers.GameManagers.GameManager
+		constexpr int update = 0x2090630;
+		constexpr int gameState = 0x18;
 	}
 
 	namespace PlayerController {

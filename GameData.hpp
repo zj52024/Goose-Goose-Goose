@@ -64,7 +64,7 @@ namespace roles {
 
 }
 
-namespace colors{
+namespace colors{ // enum must look cool~
 	constexpr int red = 0;
 	constexpr int blue = 1;
 	constexpr int yellow = 2;

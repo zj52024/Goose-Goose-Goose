@@ -12,6 +12,21 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{3aebd211-6a69-4e1c-92bc-66451764599e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header files\cheat">
+      <UniqueIdentifier>{b32ea824-8ac4-45f0-9848-4a7f0657b223}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\kiero">
+      <UniqueIdentifier>{c99af514-0640-4a4d-911c-a327fa1c50a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\MinHook">
+      <UniqueIdentifier>{105f351a-6c7f-4029-b5c1-1888f71a083c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\cheat">
+      <UniqueIdentifier>{5e6a0220-57ca-4aa2-883c-8ac6d5b1cb26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\kiero">
+      <UniqueIdentifier>{c99479ef-2750-46a0-add7-ef6844f45a22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameData.hpp">
@@ -21,12 +36,6 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="offsets.hpp">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="kiero\kiero.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\include\MinHook.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
@@ -56,8 +65,23 @@
     <ClInclude Include="struct.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui_memory_editor.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="kiero\kiero.h">
+      <Filter>Header files\kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHook\include\MinHook.h">
+      <Filter>Header files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat\gameManager.hpp">
+      <Filter>Header files\cheat</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat\playerController.hpp">
+      <Filter>Header files\cheat</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat\cinemachine.hpp">
+      <Filter>Header files\cheat</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat\esp.hpp">
+      <Filter>Header files\cheat</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -65,9 +89,6 @@
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="utils.cpp">
-      <Filter>Source files</Filter>
-    </ClCompile>
-    <ClCompile Include="kiero\kiero.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
@@ -90,6 +111,21 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="cheat\esp.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="cheat\gameManager.cpp">
+      <Filter>Source files\cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="cheat\playerController.cpp">
+      <Filter>Source files\cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\kiero.cpp">
+      <Filter>Source files\kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="cheat\cinemachine.cpp">
+      <Filter>Source files\cheat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

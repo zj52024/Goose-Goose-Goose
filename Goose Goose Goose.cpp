@@ -1,5 +1,10 @@
-﻿#include "utils.hpp"
-#include "struct.hpp"
+﻿#include "struct.hpp"
+#include "utils.hpp"
+#include "offsets.hpp"
+
+#include "cheat/cinemachine.hpp"
+#include "cheat/gameManager.hpp"
+#include "cheat/esp.hpp"
 
 #include "MinHook/include/MinHook.h"
 #include "kiero/kiero.h"
@@ -7,7 +12,6 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
-#include "imgui_memory_editor.h"
 
 #include <d3d11.h>
 #include <iostream>
@@ -15,16 +19,11 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-using namespace std;
-
 typedef HRESULT(WINAPI* PRESENT)(IDXGISwapChain*, UINT, UINT);
 typedef LRESULT(WINAPI* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef void* (_stdcall* tUpdate)(void* PlayerController);
-typedef void* (_stdcall* tCineDamp)(void* sth, Vector3 param1, Vector3 param2, float t);
 
-tCineDamp oCineDamp;
-Vector3 initial, dampTime;
-float deltaTime;
+using namespace std;
 
 ExampleAppLog appLog;
 
@@ -92,13 +91,6 @@ tUpdate hkUpdate(void* PlayerController)
 	return (tUpdate)oUpdate(PlayerController);
 }
 
-tCineDamp hkCineDamp(void* somthing, Vector3 d_param1, Vector3 d_param2, float d_t) {
-	initial = d_param1;
-	dampTime = d_param2;
-	deltaTime = d_t;
-	return (tCineDamp)oCineDamp(somthing, d_param1, d_param2, d_t);
-}
-
 HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 {
 
@@ -154,18 +146,15 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		if (canRender)
 		{
 
-			static int CurrentIdx = -1;
-
-			if (PlayerControllerList.size() > 16)
-			{
-				PlayerControllerList.clear();
-			}
-
 			{
 				ImGui::Begin("Log window");
 				ImGui::End();
 				appLog.Draw("Log window");
 			}
+
+			static int CurrentIdx = -1;
+
+			if (PlayerControllerList.size() > 16) PlayerControllerList.clear();
 
 			{
 				static int cnt = 0;
@@ -231,58 +220,13 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::Checkbox("Draw line", &drawLine);
 				ImGui::Checkbox("Draw box", &drawBox);
 				ImGui::Checkbox("Show players info", &showPlayerInfo);
-
 			}
+
+			//appLog.AddLog("[gameState] %d\n", getGameState());
 
 		}
 
-		if (canDrawESP) {
-			{
-				ImGui::SetNextWindowPos(ImVec2(0, 0));
-				ImGui::SetNextWindowSize(ImVec2(1280, 720)); // 640, 360
-				ImGui::Begin("Overlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground);
-				ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-				const ImU32 col = ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f));   //RGBA
-				int cnt = 0;
-				positionXY LocalPlayerPos = { 0.0f, 0.0f };
-
-
-				for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) { // local-based-relative calculation needed.  linear interpolation
-
-					if (!player[cnt].isLocal) 
-						{
-						float deltaX, deltaY;
-						memcpy(&LocalPlayerPos, (int*)(LocalPlayerController + GooseGooseDuck::PlayerController::position), 8);
-
-						deltaX = player[cnt].pos.x - LocalPlayerPos.x + initial.x;
-						deltaY = player[cnt].pos.y - LocalPlayerPos.y - initial.y;
-
-						if (drawLine)
-							draw_list->AddLine(ImVec2(640 + initial.x*80, 360 - initial.y*80), ImVec2(640 + deltaX * 80, 360 + deltaY * -80), ImColor(0.4f, 1.0f, 0.4f, 1.0f), 2.0f);
-
-						if (drawBox)
-							draw_list->AddRect(ImVec2(600 + deltaX * 80, 310 + deltaY * -80), ImVec2(680 + deltaX * 80, 450 + deltaY * -80), ImColor(0.5f, 0.0f, 0.0f, 1.0f), 0.0f, 0, 2.0f);
-
-						if (showPlayerInfo) {
-							char infoTexts[512];
-							if (!player[cnt].isGhost)
-								sprintf(infoTexts, u8"\n[Player Info]\n"
-									"Nickname: %s\n"
-									"inVent: %s\n"
-									"isInfected :%s\n"
-									"isSilenced: %s\n",
-									player[cnt].nickname,
-									player[cnt].inVent ? "True" : "False",
-									player[cnt].isInfected ? "True" : "False",
-									player[cnt].isSilenced ? "True" : "False");
-							draw_list->AddText(ImVec2(640 + deltaX * 80, 310 + deltaY * -80), ImColor(1.0f, 1.0f, 1.0f, 1.0f), infoTexts);
-						}
-					}
-					cnt++;
-				}
-			}
-		}
+		if (canDrawESP) ESPMain(PlayerControllerList, player, LocalPlayerController, drawLine, drawBox, showPlayerInfo);
 
 		ImGui::Render();
 		pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
@@ -308,21 +252,23 @@ void MainFunc(HMODULE hModule) {
 			appLog.AddLog("[Error] Can't create or enable Update hook.\n");
 			hooked = false;
 		}
-		else {
+		else
 			appLog.AddLog("[Info] Successfully create and enable Update hook.\n");
-		}
 
-		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::cinemachine::damp), hkCineDamp, (void**)&oCineDamp) != MH_OK
-			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::cinemachine::damp)) != MH_OK) {
-			appLog.AddLog("[Error] Can't create or enable Damp hook.\n");
-			hooked = false;
-		}
-		else {
-			appLog.AddLog("[Info] Successfully create and enable Damp hook.\n");
-		}
+
+		if (CineMachineHook()) appLog.AddLog("[Info] Successfully create and enable CineMachine hook.\n");
+		else { appLog.AddLog("[Error] Can't create or enable ChineMachine hook.\n"); hooked = false; }
+
+
+		//if (GameManagerHook()) appLog.AddLog("[Info] Successfully create and enable GameManager hook.\n");
+		//else { appLog.AddLog("[Error] Can't create or enable GameManager hook.\n"); hooked = false; }
+
 
 		if (hooked) {
 			appLog.AddLog("\n\nGoose Goose Goose, an open source program made by roy6307.\nYou can review codes on https://github.com/roy6307/Goose-Goose-Goose\n\n");
+		}
+		else {
+			appLog.AddLog("\nSome hooks couldn't be created or enabled, please don't use the cheat.\n");
 		}
 	}
 }
