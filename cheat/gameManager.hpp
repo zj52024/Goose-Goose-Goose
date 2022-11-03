@@ -4,5 +4,5 @@
 #include "utils.hpp"
 #include "MinHook/include/MinHook.h"
 
-int getGameState();                       ////////////////// NOT GOOD....
+DWORD_PTR getGameState();                       ////////////////// NOT GOOD....
 bool GameManagerHook();

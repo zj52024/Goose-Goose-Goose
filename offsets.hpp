@@ -6,13 +6,13 @@ namespace GooseGooseDuck {
 	}
 
 	namespace GameManager { 	// Managers.GameManagers.GameManager
-		constexpr int update = 0x2090630;
+		constexpr int update = 0x1CC7D70;
 		constexpr int gameState = 0x18;
 	}
 
 	namespace PlayerController {
-		constexpr int flipRVA = 0x18ADB40; // Use AOBScan, outdated.
-		constexpr int updateRVA = 0x1BFE840; // AOBScan too.
+		constexpr int flipRVA = 0x18ADB40; // Use AOBScan, outdated. NO MORE USE.
+		constexpr int updateRVA = 0x1D6B460; // AOBScan too.
 		constexpr int isSilenced = 0xC1; // Boolean
 		constexpr int isInfected = 0xC3; // Boolean
 		constexpr int playerRoleId = 0xE8; // pointer, [instance+playerRoleId] + 0x10, int

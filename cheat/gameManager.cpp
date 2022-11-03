@@ -3,10 +3,10 @@
 typedef void* (_stdcall* tGMUpdate)(void* GameManager);
 
 tGMUpdate oGMUpdate;
-int gm;
+DWORD_PTR gm;
 
 tGMUpdate hkGMUpdate(void* GameManager) {
-	gm = (int)GameManager;
+	gm = (DWORD_PTR)GameManager;
 	return (tGMUpdate)oGMUpdate(GameManager);
 }
 
@@ -19,7 +19,7 @@ bool GameManagerHook() {
 		return true;
 }
 
-int getGameState() {
+DWORD_PTR getGameState() {
 #define GET_INT_VALUE(X) *(int*)(gm+X)
 	//return GET_INT_VALUE(GooseGooseDuck::GameManager::gameState);
 	return(gm);

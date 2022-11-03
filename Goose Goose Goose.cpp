@@ -220,9 +220,13 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::Checkbox("Draw line", &drawLine);
 				ImGui::Checkbox("Draw box", &drawBox);
 				ImGui::Checkbox("Show players info", &showPlayerInfo);
+				if (ImGui::Button("Test")) {
+					appLog.AddLog("[gameState] %d\n", getGameState());
+				}
+				ImGui::End();
 			}
 
-			//appLog.AddLog("[gameState] %d\n", getGameState());
+			appLog.AddLog("[gameState] %ld\n", getGameState());
 
 		}
 
@@ -260,8 +264,8 @@ void MainFunc(HMODULE hModule) {
 		else { appLog.AddLog("[Error] Can't create or enable ChineMachine hook.\n"); hooked = false; }
 
 
-		//if (GameManagerHook()) appLog.AddLog("[Info] Successfully create and enable GameManager hook.\n");
-		//else { appLog.AddLog("[Error] Can't create or enable GameManager hook.\n"); hooked = false; }
+		if (GameManagerHook()) appLog.AddLog("[Info] Successfully create and enable GameManager hook. | %X\n", GetGameAssemblyBase(L"GameAssembly.dll")+GooseGooseDuck::GameManager::update);
+		else { appLog.AddLog("[Error] Can't create or enable GameManager hook.\n"); hooked = false; }
 
 
 		if (hooked) {
