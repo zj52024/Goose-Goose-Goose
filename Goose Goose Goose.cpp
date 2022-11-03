@@ -226,7 +226,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::End();
 			}
 
-			appLog.AddLog("[gameState] %ld\n", getGameState());
+			//appLog.AddLog("[gameState] %ld\n", getGameState());
 
 		}
 
