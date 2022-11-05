@@ -1,4 +1,5 @@
 #include "esp.hpp"
+#include "cheat/gameManager.hpp"
 
 void ESPMain(list<DWORD_PTR> PlayerControllerList, playerInfo player[], DWORD_PTR LocalPlayerController, bool drawLine, bool drawBox, bool showPlayerInfo) {
 	list<DWORD_PTR>::iterator ListIterator;
@@ -7,10 +8,14 @@ void ESPMain(list<DWORD_PTR> PlayerControllerList, playerInfo player[], DWORD_PT
 	ImGui::Begin("Overlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground);
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
+	char stateInt[5];
+	int tempInt = getGameState();
+	sprintf(stateInt, "%d", tempInt);
+	draw_list->AddText(ImVec2(1270,695), ImColor(1.0f, 1.0f, 1.0f, 1.0f), stateInt);
+
 	const ImU32 col = ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f));   //RGBA
 	int cnt = 0;
 	positionXY LocalPlayerPos = { 0.0f, 0.0f };
-
 
 	for (ListIterator = PlayerControllerList.begin(); ListIterator != PlayerControllerList.end(); ListIterator++) { // local-based-relative calculation needed.  linear interpolation
 

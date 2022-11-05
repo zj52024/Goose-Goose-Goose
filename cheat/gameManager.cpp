@@ -19,10 +19,10 @@ bool GameManagerHook() {
 		return true;
 }
 
-DWORD_PTR getGameState() {
+int getGameState() {
 #define GET_INT_VALUE(X) *(int*)(gm+X)
-	//return GET_INT_VALUE(GooseGooseDuck::GameManager::gameState);
-	return(gm);
+	int state = GET_INT_VALUE(GooseGooseDuck::GameManager::gameState);
+	return state;
 #undef GET_INT_VALUE
 }
 

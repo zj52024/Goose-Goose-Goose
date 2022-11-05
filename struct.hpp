@@ -2,7 +2,20 @@
 
 #include "imgui/imgui.h"
 #include "offsets.hpp"
+#include "cheat/gameManager.hpp"
 #include <Windows.h>
+
+enum gameStateCode
+{
+	InLobby,
+	Drafting,
+	InGame,
+	Opening, // Before Discussion
+	Discussion,
+	Voting,
+	Waiting,
+	Proceeding
+};
 
 // from imgui_demo.cpp
 struct ExampleAppLog
@@ -142,7 +155,7 @@ struct playerInfo {
 
 			memcpy(tmpNick,
 				(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x14),
-				sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10)+1); // endian issue....... I think..... Big->Littile....?
+				sizeof(wchar_t) * *(int*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::nickname) + 0x10) + 1);
 
 			memcpy(tmpRoleName,
 				(DWORD_PTR*)(*(DWORD_PTR*)(*(DWORD_PTR*)(PlayerController + GooseGooseDuck::PlayerController::playerNameRoleText) + GooseGooseDuck::PlayerController::m_text) + 0x14),
@@ -151,6 +164,9 @@ struct playerInfo {
 
 			WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, nickname, WideCharToMultiByte(CP_UTF8, 0, tmpNick, -1, NULL, 0, NULL, NULL), NULL, NULL);
 			WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, roleName, WideCharToMultiByte(CP_UTF8, 0, tmpRoleName, -1, NULL, 0, NULL, NULL), NULL, NULL);
+		}
+
+		if (getGameState() != gameStateCode::InLobby) { // already in game
 
 			memcpy(&pos, (int*)(PlayerController + GooseGooseDuck::PlayerController::position), 8);
 

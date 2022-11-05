@@ -2,7 +2,7 @@
 
 namespace GooseGooseDuck {
 	namespace cinemachine {
-		constexpr int damp = 0xD43340;   //Cinemachine.Utility.Damper.Damp(Vector3 initial, Vector3 dampTime, float deltaTime)
+		constexpr int damp = 0xD48340;   //Cinemachine.Utility.Damper.Damp(Vector3 initial, Vector3 dampTime, float deltaTime)
 	}
 
 	namespace GameManager { 	// Managers.GameManagers.GameManager

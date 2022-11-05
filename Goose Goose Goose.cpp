@@ -52,7 +52,7 @@ DWORD_PTR LocalPlayerController = 0;
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	// Don't ignore closing window even the menu opened.
-
+	//https://learn.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues#system-defined-messages
 	if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
 		canRender = !canRender;
 		return false;
@@ -169,7 +169,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::SameLine();
 				if (ImGui::Button("All roles")) {
 					for (int i = 0; i < PlayerControllerList.size(); i++) {
-						appLog.AddLog("[Player Info] Name: %s\t\tRole: %s\n", player[i].nickname, player[i].roleName);
+						appLog.AddLog("[Player Info] Name: %s\t\tRoleID: %d\n", player[i].nickname, player[i].playerRoleId);
 					}
 				}
 
@@ -187,6 +187,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 								"PlayerController: %012llX\n"
 								"Nickname: %s\n"
 								"isRoleSet: %s\n"
+								"RoleID: %d\n"
 								"RoleName: %s\n"
 								"inVent: %s\n"
 								"isGhost: %s\n"
@@ -198,6 +199,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 								player[cnt].ptrPlayerController,
 								player[cnt].nickname,
 								player[cnt].isPlayerRoleSet ? "True" : "False",
+								player[cnt].playerRoleId,
 								player[cnt].roleName,
 								player[cnt].inVent ? "True" : "False",
 								player[cnt].isGhost ? "True" : "False",
@@ -220,17 +222,12 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::Checkbox("Draw line", &drawLine);
 				ImGui::Checkbox("Draw box", &drawBox);
 				ImGui::Checkbox("Show players info", &showPlayerInfo);
-				if (ImGui::Button("Test")) {
-					appLog.AddLog("[gameState] %d\n", getGameState());
-				}
 				ImGui::End();
 			}
 
-			//appLog.AddLog("[gameState] %ld\n", getGameState());
-
 		}
 
-		if (canDrawESP) ESPMain(PlayerControllerList, player, LocalPlayerController, drawLine, drawBox, showPlayerInfo);
+		if (canDrawESP) ESPMain(PlayerControllerList, player, LocalPlayerController, drawLine, drawBox, showPlayerInfo); // ugly
 
 		ImGui::Render();
 		pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
@@ -247,10 +244,6 @@ void MainFunc(HMODULE hModule) {
 
 		bool hooked = true;
 
-		// define KIERO_USE_MINHOOK must be 1
-		// the index of the required function can be found in the METHODSTABLE.txt
-		kiero::bind(8, (void**)&oPre, hkPre);
-
 		if (MH_CreateHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA), hkUpdate, (void**)&oUpdate) != MH_OK
 			|| MH_EnableHook((void*)(GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::PlayerController::updateRVA)) != MH_OK) {
 			appLog.AddLog("[Error] Can't create or enable Update hook.\n");
@@ -260,12 +253,16 @@ void MainFunc(HMODULE hModule) {
 			appLog.AddLog("[Info] Successfully create and enable Update hook.\n");
 
 
-		if (CineMachineHook()) appLog.AddLog("[Info] Successfully create and enable CineMachine hook.\n");
+		if (CineMachineHook()) appLog.AddLog("[Info] Successfully create and enable CineMachine hook. | %X\n", GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::cinemachine::damp);
 		else { appLog.AddLog("[Error] Can't create or enable ChineMachine hook.\n"); hooked = false; }
 
 
 		if (GameManagerHook()) appLog.AddLog("[Info] Successfully create and enable GameManager hook. | %X\n", GetGameAssemblyBase(L"GameAssembly.dll")+GooseGooseDuck::GameManager::update);
 		else { appLog.AddLog("[Error] Can't create or enable GameManager hook.\n"); hooked = false; }
+
+		// define KIERO_USE_MINHOOK must be 1
+		// the index of the required function can be found in the METHODSTABLE.txt
+		kiero::bind(8, (void**)&oPre, hkPre);
 
 
 		if (hooked) {
