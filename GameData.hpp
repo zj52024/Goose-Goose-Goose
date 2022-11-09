@@ -64,7 +64,7 @@ namespace roles {
 
 }
 
-namespace colors{ // enum must look cool~
+namespace colors { // enum must look cool~
 	constexpr int red = 0;
 	constexpr int blue = 1;
 	constexpr int yellow = 2;
@@ -86,6 +86,85 @@ namespace colors{ // enum must look cool~
 	constexpr int wineRed = 18;
 	constexpr int beige = 19;
 }
+
+enum gameStateCode
+{
+	InLobby,
+	Drafting,
+	InGame,
+	Opening, // Before Discussion
+	Discussion,
+	Voting,
+	Waiting,
+	Proceeding
+};
+
+enum gameRoleId
+{
+	None,
+	Goose,
+	Duck,
+	Dodo,
+	Bounty,
+	Mechanic,
+	Technician,
+	Medium,
+	Vigilante,
+	Cannibal,
+	Morphling,
+	Sheriff,
+	Silencer,
+	Canadian,
+	LoverDuck,
+	LoverGoose,
+	Vulture,
+	Professional,
+	Spy,
+	Mimic,
+	Detective,
+	Pigeon,
+	Birdwatcher,
+	Assassin,
+	Falcon,
+	Hitman,
+	Bodyguard,
+	Snitch,
+	Politician,
+	Locksmith,
+	Mortician,
+	Celebrity,
+	Party,
+	Demolitionist,
+	DuelingDodo,
+	GHGoose,
+	GHDuck,
+	GHBounty,
+	HNSGoose,
+	HNSDuck,
+	HNSBounty,
+	DNDDuck,
+	DNDFalcon,
+	DNDVulture,
+	DNDMorphling,
+	FPGoose,
+	ExploreGoose,
+	TTVampire,
+	TTPeasant,
+	TTThrall,
+	Spectator,
+	IdentityThief,
+	Adventurer,
+	Avenger,
+	Ninja,
+	Undertaker,
+	Snoop,
+	Esper,
+	Invisibility,
+	Astral,
+	Pelican,
+	TTEThrall,
+	TTMummy
+};
 
 /*
 *  Managers.PlayerManagers.PlayerRolesManager

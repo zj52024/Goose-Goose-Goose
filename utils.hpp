@@ -11,3 +11,4 @@
 #include <Psapi.h>
 
 DWORD_PTR GetGameAssemblyBase(const wchar_t* targetModuleName);
+const char* returnRoleName(int id);

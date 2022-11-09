@@ -100,6 +100,7 @@
     <ClInclude Include="cheat\esp.hpp" />
     <ClInclude Include="cheat\gameManager.hpp" />
     <ClInclude Include="cheat\playerController.hpp" />
+    <ClInclude Include="cheat\unityEngineCamera.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -120,6 +121,7 @@
     <ClCompile Include="cheat\esp.cpp" />
     <ClCompile Include="cheat\gameManager.cpp" />
     <ClCompile Include="cheat\playerController.cpp" />
+    <ClCompile Include="cheat\unityEngineCamera.cpp" />
     <ClCompile Include="Goose Goose Goose.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />

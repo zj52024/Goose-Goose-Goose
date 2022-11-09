@@ -22,6 +22,7 @@ Just complie it with Visual Studio, and inject with your favorite injector.
 (Before compile, please check "Release x64".)
 
 After the dll injected, press insert to turn on or turn off the cheat menu.
+(Before inject make sure that the resolution of the game window is 1280x720)
 
 ## Features
 
@@ -48,6 +49,7 @@ After the dll injected, press insert to turn on or turn off the cheat menu.
 #Postscript
 
 If you have any trouble with minhook during compiling, please rebuild Minhook and replace "libMinHook.x64.lib" with your own. (Don't change the file name!)
+If you think the ESP feature is not working, click anywhere on the screen to move the character.
 
 
 ## Doo Bee Doo Baaaaaaaaaaaaaaaaaaaaaa

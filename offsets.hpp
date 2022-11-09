@@ -1,6 +1,10 @@
 #pragma once
 
 namespace GooseGooseDuck {
+	namespace unityEngineCamera {
+		constexpr int WorldToScreenPoint = 0xB26C00; // public Vector3 WorldToScreenPoint(Vector3 position)
+	}
+
 	namespace cinemachine {
 		constexpr int damp = 0xD48340;   //Cinemachine.Utility.Damper.Damp(Vector3 initial, Vector3 dampTime, float deltaTime)
 	}

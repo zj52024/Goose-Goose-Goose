@@ -5,6 +5,7 @@
 #include "cheat/cinemachine.hpp"
 #include "cheat/gameManager.hpp"
 #include "cheat/esp.hpp"
+#include "cheat/unityEngineCamera.hpp"
 
 #include "MinHook/include/MinHook.h"
 #include "kiero/kiero.h"
@@ -39,7 +40,7 @@ ID3D11RenderTargetView* mainRenderTargetView;
 bool init = false;
 bool canRender = true;
 
-bool canDrawESP = true;
+bool canDrawESP = false;
 bool drawLine = false;
 bool drawBox = false;
 bool showPlayerInfo = false;
@@ -169,7 +170,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 				ImGui::SameLine();
 				if (ImGui::Button("All roles")) {
 					for (int i = 0; i < PlayerControllerList.size(); i++) {
-						appLog.AddLog("[Player Info] Name: %s\t\tRoleID: %d\n", player[i].nickname, player[i].playerRoleId);
+						appLog.AddLog("[Player Info] Name: %s\t\tRole: %s\n", player[i].nickname, returnRoleName(player[i].playerRoleId));
 					}
 				}
 
@@ -227,7 +228,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 		}
 
-		if (canDrawESP) ESPMain(PlayerControllerList, player, LocalPlayerController, drawLine, drawBox, showPlayerInfo); // ugly
+		if ((canDrawESP == true) && (getGameState() == gameStateCode::InGame)) ESPMain(PlayerControllerList, player, LocalPlayerController, drawLine, drawBox, showPlayerInfo); // ugly
 
 		ImGui::Render();
 		pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
@@ -257,8 +258,11 @@ void MainFunc(HMODULE hModule) {
 		else { appLog.AddLog("[Error] Can't create or enable ChineMachine hook.\n"); hooked = false; }
 
 
-		if (GameManagerHook()) appLog.AddLog("[Info] Successfully create and enable GameManager hook. | %X\n", GetGameAssemblyBase(L"GameAssembly.dll")+GooseGooseDuck::GameManager::update);
+		if (GameManagerHook()) appLog.AddLog("[Info] Successfully create and enable GameManager hook. | %X\n", GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::GameManager::update);
 		else { appLog.AddLog("[Error] Can't create or enable GameManager hook.\n"); hooked = false; }
+
+		if (unityEngineCameraHook()) appLog.AddLog("[Info] Successfully create and enable WorldToScreenPoint hook. | %X\n", GetGameAssemblyBase(L"GameAssembly.dll") + GooseGooseDuck::unityEngineCamera::WorldToScreenPoint);
+		else { appLog.AddLog("[Error] Can't create or enable WorldToScreenPoint hook.\n"); hooked = false; }
 
 		// define KIERO_USE_MINHOOK must be 1
 		// the index of the required function can be found in the METHODSTABLE.txt
