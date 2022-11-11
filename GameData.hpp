@@ -163,7 +163,9 @@ enum gameRoleId
 	Astral,
 	Pelican,
 	TTEThrall,
-	TTMummy
+	TTMummy,
+	SerialKiller,
+	Engineer
 };
 
 /*

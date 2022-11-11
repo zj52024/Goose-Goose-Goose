@@ -239,6 +239,13 @@ const char* returnRoleName(int id) {
 	case gameRoleId::TTMummy:
 		return("TTMummy");
 		break;
+	case gameRoleId::SerialKiller:
+		return("SerialKiller");
+		break;
+	case gameRoleId::Engineer:
+		return("Engineer");
+		break;
+
 	default:
 		return("None");
 		break;
