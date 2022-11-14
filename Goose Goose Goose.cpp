@@ -1,4 +1,4 @@
-﻿#include "struct.hpp"
+#include "struct.hpp"
 #include "utils.hpp"
 #include "offsets.hpp"
 
@@ -50,6 +50,8 @@ list<DWORD_PTR>::iterator ListIterator;
 
 static playerInfo player[16]; // max player is 16.
 DWORD_PTR LocalPlayerController = 0;
+
+
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	// Don't ignore closing window even the menu opened.
@@ -127,7 +129,7 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			builder.AddRanges(io.Fonts->GetGlyphRangesVietnamese());
 			builder.BuildRanges(&ranges);
 
-			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 16.0f, NULL, ranges.Data);
+			io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msyh.ttc", 16.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
 			io.Fonts->Build();
 
 			ImGui::StyleColorsDark();
@@ -148,9 +150,9 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 		{
 
 			{
-				ImGui::Begin("Log window");
+				ImGui::Begin(u8"login信息窗口");
 				ImGui::End();
-				appLog.Draw("Log window");
+				appLog.Draw(u8"Log window");
 			}
 
 			static int CurrentIdx = -1;
@@ -159,18 +161,18 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 
 			{
 				static int cnt = 0;
-				ImGui::Begin("Player list");
+				ImGui::Begin(u8"Player list");
 
-				if (ImGui::Button("Clear")) {
+				if (ImGui::Button(u8"清空")) {
 					PlayerControllerList.clear();
 					for (int i = 0; i < PlayerControllerList.size(); i++) { player[i].reset(); }
 					CurrentIdx = 0;
 				}
 
 				ImGui::SameLine();
-				if (ImGui::Button("All roles")) {
+				if (ImGui::Button(u8"刷新所有")) {
 					for (int i = 0; i < PlayerControllerList.size(); i++) {
-						appLog.AddLog("[Player Info] Name: %s\t\tRole: %s\n", player[i].nickname, returnRoleName(player[i].playerRoleId));
+						appLog.AddLog(u8"[角色信息] 游戏名字: %s\t\t身份: %s\n", player[i].nickname,returnRoleName(player[i].playerRoleId));
 					}
 				}
 
@@ -184,19 +186,19 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 						if (ImGui::Selectable(player[cnt].nickname, is_selected)) {
 							ImGui::SetItemDefaultFocus();
 							CurrentIdx = cnt;
-							appLog.AddLog(u8"\n[Player Info]\n"
-								"PlayerController: %012llX\n"
-								"Nickname: %s\n"
-								"isRoleSet: %s\n"
-								"RoleID: %d\n"
-								"RoleName: %s\n"
-								"inVent: %s\n"
-								"isGhost: %s\n"
-								"isInfected :%s\n"
-								"isLocal: %s\n"
-								"isSilenced: %s\n"
-								"isSpectator: %s\n"
-								"position X: %f, Y: %f\n",
+							appLog.AddLog(u8"\n[角色信息]\n"
+								u8"PlayerController: %012llX\n"
+								u8"名字: %s\n"
+								u8"isRoleSet: %s\n"
+								u8"RoleID: %d\n"
+								u8"身份: %s\n"
+								u8"通风口: %s\n"
+								u8"幽灵: %s\n"
+								u8"是否被感染 :%s\n"
+								u8"isLocal: %s\n"
+								u8"是否被静音: %s\n"
+								u8"isSpectator: %s\n"
+								u8"位置 X: %f, Y: %f\n",
 								player[cnt].ptrPlayerController,
 								player[cnt].nickname,
 								player[cnt].isPlayerRoleSet ? "True" : "False",
@@ -218,11 +220,11 @@ HRESULT WINAPI hkPre(IDXGISwapChain* pSC, UINT SyncInterval, UINT Flags)
 			}
 
 			{
-				ImGui::Begin("ESP");
-				ImGui::Checkbox("Enable", &canDrawESP);
-				ImGui::Checkbox("Draw line", &drawLine);
-				ImGui::Checkbox("Draw box", &drawBox);
-				ImGui::Checkbox("Show players info", &showPlayerInfo);
+				ImGui::Begin(u8"功能窗口");
+				ImGui::Checkbox(u8"启动", &canDrawESP);
+				ImGui::Checkbox(u8"绘制射线", &drawLine);
+				ImGui::Checkbox(u8"绘制方框", &drawBox);
+				ImGui::Checkbox(u8"显示身份", &showPlayerInfo);
 				ImGui::End();
 			}
 
