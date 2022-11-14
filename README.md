@@ -12,6 +12,11 @@ Free open-source cheat software for **Goose Goose Duck**
 
 (I think it may be inefficient because I am not good at programming. If you think there's something to improve, please give me your active opinion.)
 
+## Current branch situation
+-Increase the language of other countries
+-Fix garbled code
+-Change the font to Microsoft Yahei
+
 
 #### It doesn't matter if it's not fun, and it's made for those who want to win.
 #### It is also made for personal study, and I am not responsible for any problems caused by using/abusing the project.
@@ -22,9 +27,9 @@ Just complie it with Visual Studio, and inject with your favorite injector.
 (Before compile, please check "Release x64".)
 
 After the dll injected, press insert to turn on or turn off the cheat menu.
-(Before inject make sure that the resolution of the game window is 1280x720)
+（注入前确保游戏窗口的分辨率为1280x720）
 
-## Features
+＃＃ 特征
 
 - User & role list (working on)
 - Draw everyone's location on map (Scheduled)
@@ -35,7 +40,8 @@ After the dll injected, press insert to turn on or turn off the cheat menu.
 ## Known bug
 
 - When inject, the game crashed. Please wait for a moment and re-inject the dll.
-- After end the game or vote time, sometimes the game crashed. I don't know about this. If you know about this, please notice me.
+- After end the game or vote time, sometimes the game crashed. 
+- Role returns is always 0
 
 
 ## Used tools
