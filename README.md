@@ -13,8 +13,11 @@ Free open-source cheat software for **Goose Goose Duck**
 (I think it may be inefficient because I am not good at programming. If you think there's something to improve, please give me your active opinion.)
 
 ## Current branch situation
+
 -Increase the language of other countries
+
 -Fix garbled code
+
 -Change the font to Microsoft Yahei
 
 
