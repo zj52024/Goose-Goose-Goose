@@ -18,6 +18,7 @@ void ESPMain(list<DWORD_PTR> PlayerControllerList, playerInfo player[], DWORD_PT
 		draw_list->AddText(ImVec2(1270, 695), ImColor(1.0f, 1.0f, 1.0f, 1.0f), stateInt);
 
 		const ImU32 col = ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f));   //RGBA
+
 		int cnt = 0;
 		Vector3 LocalPlayerPos = WorldToScreenPoint(player[0].pos);
 
@@ -36,12 +37,12 @@ void ESPMain(list<DWORD_PTR> PlayerControllerList, playerInfo player[], DWORD_PT
 				if (showPlayerInfo) {
 					char infoTexts[512];
 					if (!player[cnt].isGhost)
-						sprintf(infoTexts, u8"\n[Player Info]\n"
-							"Nickname: %s\n"
-							"Role: %s\n"
-							"inVent: %s\n"
-							"isInfected :%s\n"
-							"isSilenced: %s\n",
+						sprintf(infoTexts, u8"\n[角色信息]\n"
+							u8"游戏ID: %s\n"
+							u8"身份: %s\n"
+							u8"通风管?: %s\n"
+							u8"是否被感染 :%s\n"
+							u8"静音状态: %s\n",
 							player[cnt].nickname,
 							returnRoleName(player[cnt].playerRoleId),
 							player[cnt].inVent ? "True" : "False",
